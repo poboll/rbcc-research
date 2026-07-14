@@ -4,7 +4,7 @@ import { createApi } from "../src/server/api.mjs";
 import { createStore } from "../src/server/store.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const store = createStore({ root, persistent: false });
+const store = createStore({ root, persistent: process.env.BLOB_READ_WRITE_TOKEN ? "blob" : false });
 const api = createApi({ store, root, uploadRoot: "/tmp/rbcc-uploads" });
 
 export default async function handler(req, res) {

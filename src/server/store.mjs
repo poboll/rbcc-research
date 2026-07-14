@@ -1,10 +1,12 @@
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { get as getBlob, put as putBlob } from "@vercel/blob";
 
 export function createStore({ root, persistent = true }) {
   const dataRoot = join(root, "data");
   const deployedRoot = join(dataRoot, "deployed");
   const stateFile = join(dataRoot, "app-state.json");
+  const blobStatePath = "system/rbcc-team8-app-state.json";
   let cached;
   let writeQueue = Promise.resolve();
 
@@ -57,12 +59,22 @@ export function createStore({ root, persistent = true }) {
   }
 
   async function get() {
+    if (!cached && persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const blob = await getBlob(blobStatePath, { access: "private", useCache: false });
+        if (blob) cached = JSON.parse(await new Response(blob.stream).text());
+      } catch {}
+    }
     if (!cached) cached = await readJson(stateFile, null) ?? await seed();
     return cached;
   }
 
   async function persist(value) {
     if (!persistent) return;
+    if (persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
+      await putBlob(blobStatePath, JSON.stringify(value), { access: "private", contentType: "application/json", addRandomSuffix: false, allowOverwrite: true });
+      return;
+    }
     const temp = `${stateFile}.${process.pid}.tmp`;
     await mkdir(dirname(stateFile), { recursive: true });
     await writeFile(temp, `${JSON.stringify(value, null, 2)}\n`);

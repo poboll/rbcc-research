@@ -64,7 +64,7 @@ Recommended controls:
 
 ## Vercel behavior
 
-`api/index.mjs` is a serverless compatibility entry. Without database/storage variables it runs the seeded team data in volatile memory so preview deployments can be reviewed, but writes are not durable. Production must refuse operational use until the PostgreSQL and object-storage adapter is configured. Vercel local disk and `/tmp` are never authoritative storage.
+`api/index.mjs` is a serverless compatibility entry. When `BLOB_READ_WRITE_TOKEN` is available, media/DOCX objects and the current JSON state are persisted in private Vercel Blob. This makes the deployed workflow usable before the PostgreSQL migration, but JSON state uses whole-document writes and can lose concurrent edits. PostgreSQL remains the production target for multi-user field operation. Without Blob or database configuration, functions run seeded data in volatile memory. Vercel local disk and `/tmp` are never authoritative storage.
 
 Required environment variables:
 
@@ -73,6 +73,7 @@ DATABASE_URL                 pooled PostgreSQL URL
 SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY   server only
 SUPABASE_STORAGE_BUCKET     rbcc-private-media
+BLOB_READ_WRITE_TOKEN       automatically injected by the linked Vercel Blob store
 DEEPSEEK_API_KEY            rotate the key exposed in chat before use
 DEEPSEEK_MODEL              deepseek-v4-flash
 ```

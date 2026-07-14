@@ -13,6 +13,7 @@
     "test": "node test/smoke.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "^2.6.1",
     "busboy": "^1.6.0",
     "docx": "^9.5.1",
     "lucide-react": "^0.468.0",

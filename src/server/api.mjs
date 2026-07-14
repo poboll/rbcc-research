@@ -1,4 +1,5 @@
 import Busboy from "busboy";
+import { get as getBlob, put as putBlob } from "@vercel/blob";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { createReportDocx } from "./docx.mjs";
@@ -32,6 +33,19 @@ function safeName(value) {
   return String(value ?? "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
 }
 
+function objectKey(fields, file, category = "evidence") {
+  const now = new Date();
+  const extension = extname(file.originalName || file.storedName) || ".bin";
+  const suffix = file.storedName.replace(/\.[^.]+$/, "");
+  return `groups/${safeName(fields.groupId || "team-8")}/members/${safeName(fields.memberId)}/sites/${safeName(fields.companyId)}/${now.getUTCFullYear()}/${String(now.getUTCMonth() + 1).padStart(2, "0")}/${category}-${suffix}${extension}`;
+}
+
+async function persistBlob(fields, file, category) {
+  if (!file || !process.env.BLOB_READ_WRITE_TOKEN) return null;
+  const result = await putBlob(objectKey(fields, file, category), file.buffer, { access: "private", contentType: file.mimeType, addRandomSuffix: false });
+  return { pathname: result.pathname, url: result.url };
+}
+
 function parseMultipart(req, uploadRoot) {
   return new Promise((resolve, reject) => {
     const fields = {};
@@ -54,7 +68,7 @@ function parseMultipart(req, uploadRoot) {
           await mkdir(uploadRoot, { recursive: true });
           await writeFile(join(uploadRoot, file.storedName), file.buffer);
         }
-        resolve({ fields, file: file ? { ...file, buffer: undefined, size: total } : undefined });
+        resolve({ fields, file: file ? { ...file, size: total } : undefined });
       } catch (error) { reject(error); }
     });
     req.pipe(busboy);
@@ -140,7 +154,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       const member = state.dashboard.members?.find(item => item.memberId === fields.memberId);
       const site = member?.sites?.find(item => item.companyId === fields.companyId);
       if (!member || !site) return json({ error: "成员与站点不匹配" }, 400);
-      const finalReport = record({ groupId: state.dashboard.groupId, memberId: member.memberId, memberName: member.memberName, companyId: site.companyId, companyName: site.companyName, originalName: file.originalName, storedName: file.storedName, mimeType: file.mimeType, fileSize: file.size, published: fields.published !== "false", uploadedBy: fields.uploadedBy || "管理员" }, "final-report");
+      const blob = await persistBlob({ ...fields, groupId: state.dashboard.groupId }, file, "final-report");
+      const finalReport = record({ groupId: state.dashboard.groupId, memberId: member.memberId, memberName: member.memberName, companyId: site.companyId, companyName: site.companyName, originalName: file.originalName, storedName: file.storedName, blobPathname: blob?.pathname, mimeType: file.mimeType, fileSize: file.size, published: fields.published !== "false", uploadedBy: fields.uploadedBy || "管理员" }, "final-report");
       await store.update(value => { value.finalReports ??= {}; value.finalReports[keyFor(member.memberId, site.companyId)] = finalReport; });
       return json(finalReport, 201);
     }
@@ -194,7 +209,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     }
     if (pathname === "/api/media/upload" && req.method === "POST") {
       const { fields, file } = await parseMultipart(req, uploadRoot);
-      const item = record({ ...fields, durationSec: fields.durationSec ? Number(fields.durationSec) : undefined, fileName: file?.originalName, mimeType: file?.mimeType, fileSize: file?.size, url: file ? `/uploads/${file.storedName}` : undefined, cloudSynced: true }, "media");
+      const blob = await persistBlob(fields, file, "evidence");
+      const item = record({ ...fields, durationSec: fields.durationSec ? Number(fields.durationSec) : undefined, fileName: file?.originalName, mimeType: file?.mimeType, fileSize: file?.size, blobPathname: blob?.pathname, url: blob ? undefined : file ? `/uploads/${file.storedName}` : undefined, cloudSynced: Boolean(blob) || !process.env.VERCEL }, "media");
       await store.update(value => {
         value.media.unshift(item);
         value.agentFeed.unshift(record({ groupId: item.groupId, memberId: item.memberId, memberName: item.memberName, companyName: item.companyName, mediaId: item.id, mediaType: item.type, kind: "media_upload", message: `${item.memberName || "队员"}在${item.companyName || "调研现场"}上传了${item.type === "image" ? "一张图片" : item.type === "audio" ? "一段录音" : "一条文字留痕"}` }, "feed"));
@@ -340,8 +356,13 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/member-long-reports/download" && req.method === "GET") {
       const memberId = searchParams.get("memberId"), companyId = searchParams.get("companyId");
       const finalReport = state.finalReports?.[keyFor(memberId, companyId)];
-      if (finalReport?.storedName) {
-        const document = await readFile(join(uploadRoot, safeName(finalReport.storedName)));
+      if (finalReport?.blobPathname || finalReport?.storedName) {
+        let document;
+        if (finalReport.blobPathname && process.env.BLOB_READ_WRITE_TOKEN) {
+          const blob = await getBlob(finalReport.blobPathname, { access: "private" });
+          if (!blob) return json({ error: "管理员定稿文件不存在" }, 404);
+          document = Buffer.from(await new Response(blob.stream).arrayBuffer());
+        } else document = await readFile(join(uploadRoot, safeName(finalReport.storedName)));
         return { status: 200, body: document, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers: { "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(finalReport.originalName || "RBCC-管理员定稿.docx")}` } };
       }
       const report = baseReport(state, memberId, companyId, "iterate");
