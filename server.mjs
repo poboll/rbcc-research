@@ -9,7 +9,7 @@ const root = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const publicRoot = join(root, "public");
 const webRoot = join(root, "web-dist");
 const uploadRoot = join(root, "data", "uploads");
-const store = createStore({ root });
+const store = createStore({ root, persistent: process.env.RBCC_EPHEMERAL === "1" ? false : true });
 const api = createApi({ store, root });
 const mime = {
   ".css": "text/css; charset=utf-8", ".html": "text/html; charset=utf-8", ".ico": "image/x-icon",

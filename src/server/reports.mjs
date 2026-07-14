@@ -31,6 +31,14 @@ function evidenceFor(state, memberId, companyId) {
   return { questions, media, problems, solutions, knowledge };
 }
 
+function citationsFor(evidence) {
+  return [
+    ...evidence.media.map(item=>({id:item.id,type:"evidence",label:item.textContent||item.caption||item.fileName||"现场留痕"})),
+    ...evidence.problems.map(item=>({id:item.id,type:"problem",label:item.title||"现场痛点"})),
+    ...evidence.solutions.map(item=>({id:item.id,type:"solution",label:item.title||"分析方案"}))
+  ].slice(0,80);
+}
+
 function compactEvidence(evidence) {
   return JSON.stringify({
     questions: evidence.questions.map(q => ({ text: q.text, answer: q.answer, tags: q.tags, lens: q.lens })).slice(0, 24),
@@ -64,10 +72,11 @@ export function baseReport(state, memberId, companyId, groupModeId = "iterate") 
   sections.conception.proposals = evidence.solutions.map(item => item.description || item.title).filter(Boolean);
   const filled = REPORT_BLOCKS.flatMap(block => block.parts.map(part => sections[block.id][part])).filter(items => items.length).length;
   return {
-    meta: { title: `${site?.companyName ?? companyId} 实地调研报告`, memberId, memberName: member?.memberName ?? memberId, companyId, companyName: site?.companyName ?? companyId, groupModeId, groupModeLabel: groupModeId === "pioneer" ? "开拓组" : "迭代组", generatedAt: new Date().toISOString() },
+    meta: { title: `${site?.companyName ?? companyId} 实地调研报告`, memberId, memberName: member?.memberName ?? memberId, companyId, companyName: site?.companyName ?? companyId, groupModeId, groupModeLabel: groupModeId === "pioneer" ? "开拓组" : "迭代组", generatedAt: new Date().toISOString(), source:"evidence", version:1 },
     sections,
     autoSections: sections,
     raw: evidence,
+    citations:citationsFor(evidence),
     completeness: { percent: Math.round(filled / 16 * 100), ready: filled >= 12, missing: [] },
     hasDraft: false,
     pillarsAutofilled: true
@@ -97,7 +106,7 @@ export async function generateLongReport(state, memberId, companyId, groupModeId
       break;
     }
   }
-  const report = { ...source, sections: generated, generatedAt: new Date().toISOString(), llm: { mode: usedLlm ? "llm" : "fallback", fallbackReason } };
+  const report = { ...source, sections: generated, generatedAt: new Date().toISOString(), citations:citationsFor(evidence), meta:{...source.meta,source:usedLlm?"ai-generated":"evidence",generatedAt:new Date().toISOString()}, llm: { mode: usedLlm ? "llm" : "fallback", fallbackReason } };
   return report;
 }
 

@@ -17,6 +17,7 @@ export function ReviewHome() {
     <header className="review-hero"><div><GraduationCap size={27} /><span><small>教师评审 · {TEAM.name}</small><h1>教师评审 · {TEAM.shortName}</h1><p>五人全员外勤 · 三日七线 · 一条数据链</p></span></div><div className="review-score"><strong>{loading ? "--" : `${ready}/${reports.length}`}</strong><span>报告已就绪</span><Progress value={reports.length ? ready / reports.length * 100 : 0} tone="violet" /></div></header>
     <nav className="review-member-nav">{members.map(group=><a href={`#review-${group.memberId}`} key={group.memberId}>{group.memberId===TEAM.id?`${TEAM.theme} · 场景整合`:group.memberName}</a>)}</nav>
     <section className="review-guide"><header><h2>推荐浏览顺序（约 8 分钟）</h2></header>{[["01","队员外勤 App","路线 · 调研问题 · 现场留痕",`/app?memberId=${DEFAULT_MEMBER.id}`],["02","组内协同 Hub","问题库 · 证据链 · 全组进度","/collab"],["03","四核调研报告","现状 · 共情 · 痛点 · 对策",`/dashboard?memberId=${DEFAULT_MEMBER.id}&companyId=co-xinyuan-logistics`]].map(([n,t,d,href]) => <AppLink href={href} key={n}><strong>{n}</strong><span><h2>{t}</h2><p>{d}</p></span></AppLink>)}</section>
+    <section className="review-stages">{[["01","走访初稿","问题与留痕"],["02","组内对齐","事实与推断分层"],["03","四核写厚","证据链与方案"],["04","评审定稿","万字报告与 Word"]].map(([n,title,text])=><article key={n}><span>{n}</span><div><strong>{title}</strong><small>{text}</small></div></article>)}</section>
     <section className="representative-sites"><header><h2>队员代表站点 · 深链</h2><p>快速进入每位队员的一份万字评审报告</p></header><div>{representative.map(({group,report})=><article key={group.memberId}><span><strong>{group.memberName}</strong><small>{report.placeName} · 第{report.day||1}天</small></span><AppLink href={`/dashboard?memberId=${group.memberId}&companyId=${report.companyId}`}>编辑台</AppLink><AppLink href={`/review/report?memberId=${group.memberId}&companyId=${report.companyId}`}>万字</AppLink></article>)}</div></section>
     <ReportRows />
   </div>;
@@ -33,6 +34,7 @@ export function ReviewReport({ search }) {
   const companyId = params.get("companyId") || "co-chengzhi";
   const path = `/api/research-report?memberId=${encodeURIComponent(memberId)}&companyId=${encodeURIComponent(companyId)}&groupModeId=iterate`;
   const { data, loading, error, reload } = useAsyncJson(path, [memberId, companyId]);
+  const {data:iterations}=useAsyncJson(`/api/member-report-iterations?memberId=${encodeURIComponent(memberId)}&companyId=${encodeURIComponent(companyId)}`,[memberId,companyId]);
   if (loading) return <Loading label="加载评审正文…" />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   async function download() {
@@ -41,7 +43,8 @@ export function ReviewReport({ search }) {
   }
   return <article className="report-reader">
     <header className="reader-toolbar"><AppLink href="/review"><ArrowLeft size={15} />返回评审首页</AppLink><button className="primary-button" onClick={() => void download()}><Download size={15} />下载 Word</button></header>
-    <section className="report-cover"><FileCheck2 size={28} /><small>2026 RBCC 企业调研 · 教师评审版</small><h1>{data.meta.title}</h1><p>{data.meta.memberName} · {data.meta.groupModeLabel} · {data.meta.themeName || TEAM.name}</p><div><span>完整度 <strong>{data.completeness.percent}%</strong></span><span>生成时间 {new Date(data.meta.generatedAt || Date.now()).toLocaleDateString("zh-CN")}</span></div></section>
+    <section className="report-cover"><FileCheck2 size={28} /><small>2026 RBCC 企业调研 · 教师评审版</small><h1>{data.meta.title}</h1><p>{data.meta.memberName} · {data.meta.groupModeLabel} · {data.meta.themeName || TEAM.name}</p><div><span>完整度 <strong>{data.completeness.percent}%</strong></span><span>版本 <strong>v{data.meta.version||1}</strong> · {data.meta.source||"evidence"}</span><span>引用 <strong>{data.citations?.length||0}</strong> 条</span><span>生成时间 {new Date(data.meta.generatedAt || Date.now()).toLocaleDateString("zh-CN")}</span></div></section>
+    {iterations?.versions?.length?<section className="report-version-strip"><strong>写厚过程</strong>{iterations.versions.slice(0,8).map(version=><span key={version.id}><b>v{version.version}</b>{version.label}<small>{new Date(version.createdAt).toLocaleString("zh-CN")}</small></span>)}</section>:null}
     <nav className="report-toc">{Object.entries(BLOCK_META).map(([id,[index,title]]) => <a key={id} href={`#${id}`}><strong>{index}</strong>{title}</a>)}</nav>
     <div className="report-body">{Object.entries(BLOCK_META).map(([blockId,[index,title]]) => <section id={blockId} key={blockId}><header><span>{index}</span><h2>{title}</h2></header>{Object.entries(data.sections?.[blockId] ?? {}).map(([part,items]) => items?.length ? <div className="report-part" key={part}><h3>{PART_TITLES[part] || part}</h3>{items.map((paragraph,i) => <p key={i}>{part === "voices" ? <Quote size={15} /> : null}{paragraph}</p>)}</div> : null)}</section>)}</div>
   </article>;

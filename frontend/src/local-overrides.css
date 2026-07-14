@@ -1,0 +1,11 @@
+@media(min-width:701px){
+  .mobile-nav{display:none}
+  .field-content{padding-bottom:28px}
+}
+@media(max-width:700px){
+  .mobile-nav{display:flex}
+  .field-content{max-width:100%;padding:12px 14px 82px}
+  .route-capture>header{display:block}
+  .route-capture>header h1{font-size:25px}
+  .route-capture>header>.status{margin-top:8px}
+}

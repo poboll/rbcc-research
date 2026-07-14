@@ -10,6 +10,19 @@ import { keyFor } from "./store.mjs";
 const json = (body, status = 200, headers = {}) => ({ status, body: JSON.stringify(body), type: "application/json; charset=utf-8", headers });
 const MAX_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+const MEDIA_TYPES = new Set(["image/jpeg","image/png","image/webp","audio/mpeg","audio/mp4","audio/x-m4a","audio/wav"]);
+
+function validFileSignature(file) {
+  if (!file?.buffer?.length) return true;
+  const b=file.buffer;
+  if(file.mimeType==="image/jpeg")return b[0]===0xff&&b[1]===0xd8&&b[2]===0xff;
+  if(file.mimeType==="image/png")return b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+  if(file.mimeType==="image/webp")return b.subarray(0,4).toString()==="RIFF"&&b.subarray(8,12).toString()==="WEBP";
+  if(file.mimeType==="audio/mpeg")return b.subarray(0,3).toString()==="ID3"||(b[0]===0xff&&(b[1]&0xe0)===0xe0);
+  if(["audio/mp4","audio/x-m4a"].includes(file.mimeType))return b.subarray(4,8).toString()==="ftyp";
+  if(file.mimeType==="audio/wav")return b.subarray(0,4).toString()==="RIFF"&&b.subarray(8,12).toString()==="WAVE";
+  return false;
+}
 
 async function body(req) {
   const chunks = [];
@@ -141,6 +154,19 @@ function evidenceContext(state, memberId, companyId) {
   };
 }
 
+function evidenceRefs(context) {
+  return [...context.media, ...context.problems, ...context.solutions].map(item => item.id).filter(Boolean);
+}
+
+function fallbackObservations(context) {
+  return context.media.map(item => ({
+    text: item.textContent || item.caption || item.title || item.fileName,
+    sourceId: item.id,
+    kind: item.type === "audio" ? "quote" : "fact",
+    confidence: item.textContent || item.caption ? "direct" : "needs-review"
+  })).filter(item => item.text).slice(0, 8);
+}
+
 function fallbackAgent(context, companyName) {
   const confirmed = context.problems.filter(item => item.validationOutcome === "confirmed").slice(0, 3);
   const quotes = context.media.map(item => item.textContent || item.caption).filter(Boolean).slice(0, 2);
@@ -165,6 +191,32 @@ function requireAdmin(req) {
   if (req.headers["x-admin-token"] !== expected) throw Object.assign(new Error("管理员凭证无效"), { status: 401 });
 }
 
+function syncTeamState(state) {
+  const existingSites = new Map((state.dashboard.members ?? []).flatMap(member => (member.sites ?? []).map(site => [`${member.memberId}:${site.routeId}:${site.companyId}`, site])));
+  const members = state.teamConfig.members.map(member => {
+    const sites = [];
+    for (const route of state.teamConfig.routes) {
+      if (!route.memberIds.includes(member.id)) continue;
+      for (const stop of route.stops) {
+        const previous = existingSites.get(`${member.id}:${route.id}:${stop.companyId}`) ?? {};
+        sites.push({ questionsSaved:false, questionsComplete:false, questions:[], questionValidation:[], questionsValidatedCount:0, pioneerTaggedCount:0, iterateTaggedCount:0, pendingTaggedCount:0, ...previous, ...stop, day:route.day, date:route.date, routeId:route.id, routeLabel:route.label });
+      }
+    }
+    return { memberId:member.id, memberName:member.name, sites, sitesComplete:sites.filter(site=>site.questionsComplete).length, totalSites:sites.length };
+  });
+  const uniqueSites = new Set(state.teamConfig.routes.flatMap(route => route.stops.map(stop => stop.companyId))).size;
+  state.dashboard.members = members;
+  state.dashboard.groupName = state.teamConfig.group.name;
+  state.dashboard.summary = { ...state.dashboard.summary, memberCount:members.length, uniqueSiteCount:uniqueSites, siteAssignmentCount:members.reduce((sum,member)=>sum+member.totalSites,0), sitesQuestionsComplete:members.flatMap(member=>member.sites).filter(site=>site.questionsComplete).length };
+  state.dashboard.updatedAt = new Date().toISOString();
+  state.collab.members = state.teamConfig.members.map(member => ({ memberId:member.id, memberName:member.name, role:member.role }));
+  state.destinations = Object.fromEntries(members.map(member => [member.memberId, { ...(state.destinations[member.memberId] ?? {}), memberId:member.memberId, companyIds:[...new Set(member.sites.map(site=>site.companyId))], routeConfirmed:true, updatedAt:new Date().toISOString() }]));
+  for (const member of members) {
+    const current = state.memberLongReports[member.memberId] ?? {};
+    state.memberLongReports[member.memberId] = { ...current, memberId:member.memberId, memberName:member.memberName, targetChars:10000, template:"rbcc", reports:member.sites.map(site => ({ ...(current.reports?.find(report=>report.companyId===site.companyId) ?? {}), companyId:site.companyId, placeName:site.companyName, filename:`${member.memberName}-${site.companyName}-调研报告.docx`, day:site.day, groupModeId:"iterate" })) };
+  }
+}
+
 export function createApi({ store, root, uploadRoot = join(root, "data", "uploads") }) {
 
   return async function api(req, url) {
@@ -179,7 +231,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       return json({
         teamConfig: state.teamConfig,
         dashboard: state.dashboard,
-        counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, knowledgeSources: state.knowledgeSources?.length ?? 0, knowledgeChunks: state.knowledgeChunks?.length ?? 0, finalReports: Object.keys(state.finalReports ?? {}).length },
+        counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, knowledgeSources: state.knowledgeSources?.length ?? 0, knowledgeChunks: state.knowledgeChunks?.length ?? 0, finalReports: Object.keys(state.finalReports ?? {}).length, reportVersions:Object.values(state.iterations??{}).reduce((sum,item)=>sum+(item.versions?.length??0),0) },
+        storage:{mode:process.env.BLOB_READ_WRITE_TOKEN?"private-blob":"local-json",persistent:Boolean(process.env.BLOB_READ_WRITE_TOKEN)||!process.env.VERCEL,warning:process.env.BLOB_READ_WRITE_TOKEN?"私有 Blob 已连接；并发整份 JSON 写入仍可能后写覆盖先写。":"当前未连接生产持久存储。"},
         knowledgeSources: state.knowledgeSources ?? [],
         finalReports: Object.values(state.finalReports ?? {}),
         tasks: state.collab.tasks ?? [],
@@ -191,6 +244,36 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       requireAdmin(req);
       return json(state, 200, { "content-disposition": `attachment; filename="rbcc-team8-${new Date().toISOString().slice(0, 10)}.json"` });
     }
+    if (pathname.startsWith("/api/admin/members/") && req.method === "PATCH") {
+      requireAdmin(req);
+      const id = pathname.split("/").pop(), patch = await body(req);
+      const member = state.teamConfig.members.find(item => item.id === id);
+      if (!member) return json({ error:"成员不存在" },404);
+      await store.update(value => {
+        const target=value.teamConfig.members.find(item=>item.id===id);Object.assign(target,{name:String(patch.name||target.name).trim(),role:String(patch.role||target.role).trim()});
+        for(const list of [value.media,value.problems,value.solutions,value.collab.updates])for(const item of list??[])if(item.memberId===id)item.memberName=target.name;
+        syncTeamState(value);
+      });
+      return json(state.teamConfig.members.find(item=>item.id===id));
+    }
+    if (pathname.startsWith("/api/admin/routes/") && req.method === "PATCH") {
+      requireAdmin(req);
+      const id=pathname.split("/").pop(),patch=await body(req);const route=state.teamConfig.routes.find(item=>item.id===id);if(!route)return json({error:"路线不存在"},404);
+      await store.update(value=>{const target=value.teamConfig.routes.find(item=>item.id===id);Object.assign(target,{label:String(patch.label??target.label).trim(),date:patch.date??target.date,capacity:Number(patch.capacity??target.capacity),memberIds:Array.isArray(patch.memberIds)?patch.memberIds:target.memberIds});const task=value.collab.tasks.find(item=>item.id===`task-${id}`);if(task){task.title=`Day ${target.day} · ${target.label} 行前确认`;task.description=`${target.memberIds.map(memberId=>value.teamConfig.members.find(member=>member.id===memberId)?.name).filter(Boolean).join("、")}：确认集合、访谈分工、拍摄边界与问题清单`;}syncTeamState(value)});
+      return json(state.teamConfig.routes.find(item=>item.id===id));
+    }
+    if (pathname.startsWith("/api/admin/stops/") && req.method === "PATCH") {
+      requireAdmin(req);
+      const [routeId,companyId]=pathname.replace("/api/admin/stops/","").split("/");const patch=await body(req);const route=state.teamConfig.routes.find(item=>item.id===routeId);const stop=route?.stops.find(item=>item.companyId===companyId);if(!stop)return json({error:"站点不存在"},404);
+      await store.update(value=>{const target=value.teamConfig.routes.find(item=>item.id===routeId).stops.find(item=>item.companyId===companyId);for(const key of ["companyName","themeName","activity","time","meetingPoint"])if(key in patch)target[key]=String(patch[key]??"").trim();syncTeamState(value)});
+      return json(stop);
+    }
+    if (pathname.startsWith("/api/admin/evidence/") && req.method === "DELETE") {
+      requireAdmin(req);const id=pathname.split("/").pop();await store.update(value=>{value.media=value.media.filter(item=>item.id!==id);value.agentFeed=value.agentFeed.filter(item=>item.mediaId!==id)});return json({ok:true});
+    }
+    if (pathname.startsWith("/api/admin/final-reports/") && req.method === "DELETE") {
+      requireAdmin(req);const key=decodeURIComponent(pathname.split("/").pop());await store.update(value=>{delete value.finalReports[key]});return json({ok:true});
+    }
     if (pathname === "/api/admin/report-upload" && req.method === "POST") {
       requireAdmin(req);
       const { fields, file } = await parseMultipart(req, uploadRoot);
@@ -201,7 +284,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       if (!member || !site) return json({ error: "成员与站点不匹配" }, 400);
       const blob = await persistBlob({ ...fields, groupId: state.dashboard.groupId }, file, "final-report");
       const finalReport = record({ groupId: state.dashboard.groupId, memberId: member.memberId, memberName: member.memberName, companyId: site.companyId, companyName: site.companyName, originalName: file.originalName, storedName: file.storedName, blobPathname: blob?.pathname, mimeType: file.mimeType, fileSize: file.size, published: fields.published !== "false", uploadedBy: fields.uploadedBy || "管理员" }, "final-report");
-      await store.update(value => { value.finalReports ??= {}; value.finalReports[keyFor(member.memberId, site.companyId)] = finalReport; });
+      await store.update(value => { const key=keyFor(member.memberId,site.companyId);value.finalReports ??= {}; value.finalReports[key] = finalReport;value.iterations[key]??={memberId:member.memberId,companyId:site.companyId,versions:[]};const version=value.iterations[key].versions.length+1;value.iterations[key].versions.unshift({id:`final-v${version}-${Date.now()}`,version,source:"admin-final",label:`管理员定稿 v${version}`,filename:file.originalName,createdAt:new Date().toISOString()}) });
       return json(finalReport, 201);
     }
 
@@ -212,6 +295,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       return json(item, 201);
     }
     if (req.method === "PATCH" && pathname.startsWith("/api/collab/tasks/")) {
+      if (req.headers["x-admin-token"]) requireAdmin(req);
       const id = pathname.split("/").pop();
       const patch = await body(req);
       let found;
@@ -252,15 +336,61 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       if (searchParams.get("stats") === "1") return json({ total: items.length, images: items.filter(item => item.type === "image").length, audio: items.filter(item => item.type === "audio").length, text: items.filter(item => item.type === "text").length, cloudSynced: items.filter(item => item.cloudSynced).length });
       return json({ items: items.sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))) });
     }
+    if (pathname.startsWith("/api/media/file/") && req.method === "GET") {
+      const id=pathname.split("/").pop();const item=state.media.find(value=>value.id===id);if(!item)return json({error:"现场文件不存在"},404);
+      let document;if(item.blobPathname&&process.env.BLOB_READ_WRITE_TOKEN){const blob=await getBlob(item.blobPathname,{access:"private"});if(!blob)return json({error:"现场文件不存在"},404);document=Buffer.from(await new Response(blob.stream).arrayBuffer())}else if(item.storedName)document=await readFile(join(uploadRoot,safeName(item.storedName)));else return json({error:"该留痕没有附件"},404);
+      return {status:200,body:document,type:item.mimeType||"application/octet-stream",headers:{"content-disposition":`inline; filename*=UTF-8''${encodeURIComponent(item.fileName||"evidence")}`}};
+    }
     if (pathname === "/api/media/upload" && req.method === "POST") {
       const { fields, file } = await parseMultipart(req, uploadRoot);
+      if(file&&(!MEDIA_TYPES.has(file.mimeType)||!validFileSignature(file)))return json({error:"文件类型或文件内容不受支持"},415);
       const blob = await persistBlob(fields, file, "evidence");
-      const item = record({ ...fields, durationSec: fields.durationSec ? Number(fields.durationSec) : undefined, fileName: file?.originalName, mimeType: file?.mimeType, fileSize: file?.size, blobPathname: blob?.pathname, url: blob ? undefined : file ? `/uploads/${file.storedName}` : undefined, cloudSynced: Boolean(blob) || !process.env.VERCEL }, "media");
+      const item = record({ ...fields, evidenceKind: fields.evidenceKind || (fields.type === "audio" ? "quote" : "observation"), synthesisStatus:"pending", linkedProblemIds:[], durationSec: fields.durationSec ? Number(fields.durationSec) : undefined, fileName: file?.originalName, storedName:file?.storedName, mimeType: file?.mimeType, fileSize: file?.size, blobPathname: blob?.pathname, cloudSynced: Boolean(blob) || !process.env.VERCEL }, "media");
+      if(file)item.url=`/api/media/file/${item.id}`;
       await store.update(value => {
         value.media.unshift(item);
         value.agentFeed.unshift(record({ groupId: item.groupId, memberId: item.memberId, memberName: item.memberName, companyName: item.companyName, mediaId: item.id, mediaType: item.type, kind: "media_upload", message: `${item.memberName || "队员"}在${item.companyName || "调研现场"}上传了${item.type === "image" ? "一张图片" : item.type === "audio" ? "一段录音" : "一条文字留痕"}` }, "feed"));
       });
       return json(item, 201);
+    }
+
+    if (pathname === "/api/evidence/synthesize" && req.method === "POST") {
+      const input = await body(req);
+      if (!input.memberId || !input.companyId) return json({ error:"缺少成员或站点" },400);
+      const context = evidenceContext(state,input.memberId,input.companyId);
+      if (input.action === "observations") {
+        let observations=fallbackObservations(context),mode="knowledge";
+        try {
+          const answer=await complete([{role:"system",content:"只基于输入留痕提取结构化观察点，输出 JSON observations 数组，每项包含 text,sourceId,kind(fact|quote|inference|pending),confidence(direct|inferred|needs-review)。不得新增事实。"},{role:"user",content:JSON.stringify(context.media).slice(0,40000)}],{maxTokens:1800});
+          const parsed=extractJson(answer);if(parsed?.observations?.length){observations=parsed.observations;mode="llm"}
+        } catch {}
+        await store.update(value=>{for(const media of value.media.filter(item=>item.memberId===input.memberId&&item.companyId===input.companyId)){media.synthesisStatus="reviewed";media.updatedAt=new Date().toISOString()}});
+        return json({observations,mode,sourceIds:context.media.map(item=>item.id)});
+      }
+      if (input.action === "problem") {
+        const observations=(input.observations??fallbackObservations(context)).filter(item=>item.text);
+        if(!observations.length)return json({error:"请先上传并提炼现场留痕"},422);
+        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}现场流程痛点`,evidence:observations.map(item=>item.text).join("；"),observationIds:observations.map(item=>item.sourceId).filter(Boolean),validationOutcome:"pending",severity:"normal",source:"agent"},"problem");
+        await store.update(value=>value.problems.unshift(item));return json(item,201);
+      }
+      if (input.action === "solution") {
+        const confirmed=context.problems.filter(item=>item.validationOutcome==="confirmed");
+        if(!confirmed.length)return json({error:"至少确认一条痛点后才能生成方案"},422);
+        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}人机协同最小试点`,description:input.description||"围绕已验证痛点建立小范围试点，保留人工最终判断权，并比较处理时长、返工率与一线采用率。",linkedProblemIds:confirmed.map(item=>item.id).slice(0,5),metrics:["处理时长","返工率","一线采用率"],source:"agent"},"solution");
+        await store.update(value=>value.solutions.unshift(item));return json(item,201);
+      }
+      if (input.action === "report") {
+        const key=keyFor(input.memberId,input.companyId);const base=baseReport(state,input.memberId,input.companyId,"iterate");const sections=normalizeSections(state.reportDrafts[key]?.sections??base.sections);
+        const refs=evidenceRefs(context);sections.empathy.fieldNotes=[...new Set([...sections.empathy.fieldNotes,...context.media.map(item=>item.textContent||item.caption).filter(Boolean)])];sections.painPoints.evidence=[...new Set([...sections.painPoints.evidence,...context.problems.map(item=>`[${item.id}] ${item.evidence||item.title}`).filter(Boolean)])];sections.conception.proposals=[...new Set([...sections.conception.proposals,...context.solutions.map(item=>`[${item.id}] ${item.description||item.title}`).filter(Boolean)])];
+        const draft={memberId:input.memberId,companyId:input.companyId,groupModeId:"iterate",sections,evidenceRefs:refs,source:"evidence-chain",updatedAt:new Date().toISOString()};await store.update(value=>{value.reportDrafts[key]=draft});return json({draft,addedRefs:refs.length});
+      }
+      return json({error:"未知提炼动作"},400);
+    }
+
+    if (pathname.startsWith("/api/problems/") && req.method === "PATCH") {
+      const id=pathname.split("/").pop(),patch=await body(req);let found;
+      await store.update(value=>{found=value.problems.find(item=>item.id===id);if(found)Object.assign(found,{validationOutcome:patch.validationOutcome??found.validationOutcome,validationNote:patch.validationNote??found.validationNote,updatedAt:new Date().toISOString()})});
+      return found?json(found):json({error:"痛点不存在"},404);
     }
 
     if (pathname === "/api/knowledge") {
@@ -300,6 +430,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       return json({ source, chunkCount: chunks.length }, 201);
     }
     if (pathname === "/api/knowledge/sources" && req.method === "DELETE") {
+      if (req.headers["x-admin-token"]) requireAdmin(req);
       const id = searchParams.get("id");
       await store.update(value => {
         value.knowledgeSources = (value.knowledgeSources ?? []).filter(item => item.id !== id);
@@ -363,7 +494,13 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/research-dashboard" && req.method === "GET") {
       const memberId = searchParams.get("memberId");
       const dashboard = structuredClone(state.dashboard);
-      for (const member of dashboard.members ?? []) for (const site of member.sites ?? []) site.questions = state.researchQuestions[keyFor(member.memberId, site.companyId)] ?? site.questions ?? [];
+      for (const member of dashboard.members ?? []) for (const site of member.sites ?? []) {
+        site.questions = state.researchQuestions[keyFor(member.memberId, site.companyId)] ?? site.questions ?? [];
+        site.questionsComplete=site.questions.length>0;site.questionsValidatedCount=site.questions.filter(item=>item.answer||item.validationOutcome==="confirmed").length;
+        site.pioneerTaggedCount=site.questions.filter(item=>item.lens==="pioneer").length;site.iterateTaggedCount=site.questions.filter(item=>item.lens==="iterate").length;
+        site.evidenceCount=state.media.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.problemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.confirmedProblemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId&&item.validationOutcome==="confirmed").length;site.solutionCount=state.solutions.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.reportAvailable=Boolean(state.generatedReports[keyFor(member.memberId,site.companyId)]||state.finalReports?.[keyFor(member.memberId,site.companyId)]);
+      }
+      const allSites=dashboard.members?.flatMap(member=>member.sites??[])??[];dashboard.summary={...dashboard.summary,sitesQuestionsComplete:allSites.filter(site=>site.questionsComplete).length,sitesDualValidated:allSites.filter(site=>site.pioneerTaggedCount&&site.iterateTaggedCount).length,evidenceCount:state.media.length,problemCount:state.problems.length,confirmedProblemCount:state.problems.filter(item=>item.validationOutcome==="confirmed").length,solutionCount:state.solutions.length,linkedSolutionCount:state.solutions.filter(item=>item.linkedProblemIds?.length).length,reportReadyCount:Object.keys(state.generatedReports??{}).length+Object.keys(state.finalReports??{}).length};
       if (memberId) dashboard.members = dashboard.members?.filter(item => item.memberId === memberId) ?? [];
       dashboard.updatedAt = state.updatedAt;
       return json(dashboard);
@@ -376,8 +513,9 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     }
     if (pathname === "/api/research-report/draft" && req.method === "PUT") {
       const input = await body(req);
-      const draft = { memberId: input.memberId, companyId: input.companyId, groupModeId: input.groupModeId, sections: normalizeSections(input.sections), updatedAt: new Date().toISOString() };
-      await store.update(value => { value.reportDrafts[keyFor(input.memberId, input.companyId)] = draft; });
+      const key=keyFor(input.memberId,input.companyId);const previous=state.iterations[key]?.versions?.length??0;
+      const draft = { memberId: input.memberId, companyId: input.companyId, groupModeId: input.groupModeId, sections: normalizeSections(input.sections), source:"manual-draft", version:previous+1, updatedAt: new Date().toISOString() };
+      await store.update(value => { value.reportDrafts[key] = draft;value.iterations[key]??={memberId:input.memberId,companyId:input.companyId,versions:[]};value.iterations[key].versions.unshift({id:`draft-v${draft.version}-${Date.now()}`,version:draft.version,source:draft.source,label:`工作稿 v${draft.version}`,createdAt:draft.updatedAt}) });
       return json({ draft });
     }
     if (pathname === "/api/research-report/chat" && req.method === "POST") {
@@ -413,7 +551,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       const input = await body(req);
       if (!input.memberId || !input.companyId || !input.groupModeId) return json({ error: "缺少报告定位参数" }, 400);
       const report = input.useLlm === false ? baseReport(state, input.memberId, input.companyId, input.groupModeId) : await generateLongReport(state, input.memberId, input.companyId, input.groupModeId);
-      await store.update(value => { value.generatedReports[keyFor(input.memberId, input.companyId)] = report; });
+      const key=keyFor(input.memberId,input.companyId);const version=(state.iterations[key]?.versions?.length??0)+1;report.meta={...report.meta,version,source:report.llm?.mode==="llm"?"ai-generated":"evidence"};
+      await store.update(value => { value.generatedReports[key] = report;value.iterations[key]??={memberId:input.memberId,companyId:input.companyId,versions:[]};value.iterations[key].versions.unshift({id:`report-v${version}-${Date.now()}`,version,source:report.meta.source,label:report.meta.source==="ai-generated"?`AI 生成版 v${version}`:`证据版 v${version}`,citationCount:report.citations?.length??0,createdAt:new Date().toISOString()}) });
       if (input.format === "docx") {
         const document = await createReportDocx(report);
         const filename = `${report.meta.memberName || "RBCC"}-${report.meta.companyName || "调研"}-调研报告.docx`;
@@ -446,7 +585,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       const filename = `${report.meta.memberName || "RBCC"}-${report.meta.companyName || "调研"}-调研报告.docx`;
       return { status: 200, body: document, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers: { "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(filename)}` } };
     }
-    if (pathname === "/api/member-report-iterations" && req.method === "GET") return json(state.iterations[searchParams.get("memberId")] ?? { memberId: searchParams.get("memberId"), versions: [] });
+    if (pathname === "/api/member-report-iterations" && req.method === "GET") {const memberId=searchParams.get("memberId"),companyId=searchParams.get("companyId");if(companyId)return json(state.iterations[keyFor(memberId,companyId)]??{memberId,companyId,versions:[]});return json({memberId,versions:Object.values(state.iterations??{}).filter(item=>item.memberId===memberId).flatMap(item=>item.versions??[]).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)))})}
     if (pathname === "/api/review/member-questions" && req.method === "GET") return json(state.reviewQuestions[searchParams.get("memberId")] ?? { sites: [] });
 
     if (req.method === "GET" && pathname === "/api/group-progress") return json(await readSeed(store, "group-progress.json", { groups: [] }));

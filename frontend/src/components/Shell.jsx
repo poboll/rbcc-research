@@ -29,11 +29,11 @@ export function Shell({ pathname, children, subtitle, bare = false }) {
       <nav aria-label="协作大屏主导航">
         {nav.map(([href, label, Icon], index) => <React.Fragment key={href}>
           {index === 3 ? <span className="nav-divider" /> : null}
-          <AppLink href={href} className={pathname === href || (href !== "/" && pathname.startsWith(`${href}/`)) ? "active" : ""}><Icon size={14} /><span>{label}</span></AppLink>
+          <AppLink href={href} title={label} className={pathname === href || (href !== "/" && pathname.startsWith(`${href}/`)) ? "active" : ""}><Icon size={14} /><span>{label}</span></AppLink>
         </React.Fragment>)}
       </nav>
     </header> : <header className="module-header">
-      <button type="button" className="desktop-bridge"><Monitor size={17}/><span><strong>智能呈现 · 桌面协同</strong><small>查看各组进度与受阻项</small></span></button>
+      <AppLink href="/screen" className="desktop-bridge"><Monitor size={17}/><span><strong>智能呈现 · 桌面协同</strong><small>查看全组进度、受阻项与路演</small></span></AppLink>
       <nav>{moduleNav.map(([href,label])=><AppLink key={href} href={href} className={pathname === href || (href !== "/" && pathname.startsWith(`${href}/`)) ? "active" : ""}>{label}</AppLink>)}</nav>
     </header>}
     {subtitle ? <div className="subbar">{subtitle}</div> : null}
