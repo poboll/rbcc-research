@@ -1,0 +1,7 @@
+.admin-knowledge{border:1px solid var(--line);border-radius:8px;background:#080d1c;padding:15px}
+.admin-knowledge>header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:10px}
+.admin-knowledge h2{font-size:13px;margin:0}.admin-knowledge header p{font-size:9px;color:#64748b}
+.admin-knowledge header a{border:1px solid #0e7490;border-radius:6px;padding:7px 9px;color:#67e8f9}
+.admin-knowledge article{display:grid;grid-template-columns:24px 1fr auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:11px 0}
+.admin-knowledge article>svg{color:#22d3ee}.admin-knowledge strong,.admin-knowledge small{display:block}
+.admin-knowledge small{color:#64748b;font-size:8px;margin-top:3px}.admin-knowledge article>span{color:#34d399;font-size:9px}

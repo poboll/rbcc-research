@@ -23,7 +23,7 @@ async function expectOk(path, options) {
 
 try {
   await waitForServer();
-  const routes = ["/", "/screen", "/screen/roadshow", "/design", "/review", "/review/report?memberId=member-jin&companyId=co-xinyuan-logistics", "/app", "/library", "/agent", "/traces", "/dashboard", "/collab", "/admin"];
+  const routes = ["/", "/screen", "/screen/roadshow", "/design", "/review", "/review/report?memberId=member-jin&companyId=co-xinyuan-logistics", "/app", "/library", "/knowledge", "/install", "/agent", "/traces", "/dashboard", "/collab", "/admin"];
   for (const route of routes) {
     const html = await (await expectOk(route)).text();
     if (!html.includes('id="root"') || !html.includes('/assets/')) throw new Error(`${route}: not served by the React source build`);
@@ -32,6 +32,16 @@ try {
   if (team.group?.id !== "team-8" || team.members?.length !== 5 || team.routes?.length !== 7) throw new Error("team config migration mismatch");
   const admin = await (await expectOk("/api/admin/summary")).json();
   if (admin.counts?.members !== 5 || admin.counts?.assignments !== 48) throw new Error("admin summary contract mismatch");
+  const knowledgeForm = new FormData();
+  knowledgeForm.set("groupId", "team-8");
+  knowledgeForm.set("title", "冒烟测试知识");
+  knowledgeForm.set("tags", "测试,信源物流");
+  knowledgeForm.set("file", new Blob(["信源物流现场调研应关注生产线、研发制造交流、流程异常和一线人员的真实证据。该资料仅用于自动化冒烟测试。"], { type: "text/plain" }), "smoke-knowledge.txt");
+  const mounted = await (await expectOk("/api/knowledge/upload", { method: "POST", body: knowledgeForm })).json();
+  if (!mounted.source?.id || mounted.chunkCount < 1) throw new Error("knowledge mounting contract mismatch");
+  const search = await (await expectOk(`/api/knowledge/search?q=${encodeURIComponent("生产线 流程异常")}`)).json();
+  if (!search.results?.some(item => item.sourceId === mounted.source.id)) throw new Error("knowledge search contract mismatch");
+  await expectOk(`/api/knowledge/sources?id=${encodeURIComponent(mounted.source.id)}`, { method: "DELETE" });
   const dashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   if (dashboard.members?.length !== 1 || dashboard.members[0].sites?.length !== 10 || dashboard.summary?.siteAssignmentCount !== 48 || dashboard.summary?.uniqueSiteCount !== 22) throw new Error("dashboard member/site contract mismatch");
   const report = await (await expectOk("/api/research-report?memberId=member-jin&companyId=co-xinyuan-logistics&groupModeId=iterate")).json();
@@ -42,7 +52,7 @@ try {
   if (!(docx.headers.get("content-type") ?? "").includes("wordprocessingml")) throw new Error("docx content type mismatch");
   const bytes = new Uint8Array(await docx.arrayBuffer());
   if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) throw new Error("docx is not a ZIP package");
-  console.log("smoke: 13 pages, admin, team-8 routes, dashboard, report, agent fallback, and DOCX passed");
+  console.log("smoke: 15 pages, knowledge mount/search, admin, team-8 routes, report, Agent, and DOCX passed");
 } finally {
   server.kill("SIGTERM");
   await Promise.race([once(server, "exit"), new Promise(resolve => setTimeout(resolve, 1000))]);

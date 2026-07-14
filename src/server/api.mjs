@@ -46,6 +46,50 @@ async function persistBlob(fields, file, category) {
   return { pathname: result.pathname, url: result.url };
 }
 
+async function extractDocument(file) {
+  const extension = extname(file.originalName || "").toLowerCase();
+  if ([".txt", ".md", ".markdown", ".csv"].includes(extension)) return file.buffer.toString("utf8");
+  if (extension === ".json") return JSON.stringify(JSON.parse(file.buffer.toString("utf8")), null, 2);
+  if (extension === ".docx") {
+    const mammoth = await import("mammoth");
+    return (await mammoth.extractRawText({ buffer: file.buffer })).value;
+  }
+  if (extension === ".pdf") {
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: file.buffer });
+    try { return (await parser.getText()).text; }
+    finally { await parser.destroy(); }
+  }
+  throw Object.assign(new Error("仅支持 PDF、DOCX、Markdown、TXT、CSV 和 JSON"), { status: 415 });
+}
+
+function chunkDocument(text, size = 1200, overlap = 180) {
+  const normalized = String(text ?? "").replace(/\r/g, "").replace(/\n{3,}/g, "\n\n").trim();
+  const chunks = [];
+  let offset = 0;
+  while (offset < normalized.length) {
+    let end = Math.min(normalized.length, offset + size);
+    if (end < normalized.length) {
+      const boundary = Math.max(normalized.lastIndexOf("\n", end), normalized.lastIndexOf("。", end));
+      if (boundary > offset + size * 0.55) end = boundary + 1;
+    }
+    chunks.push({ position: chunks.length, content: normalized.slice(offset, end).trim() });
+    if (end >= normalized.length) break;
+    offset = Math.max(offset + 1, end - overlap);
+  }
+  return chunks.filter(item => item.content);
+}
+
+function searchKnowledge(state, query, limit = 20) {
+  const terms = String(query ?? "").toLowerCase().split(/[\s，、,。；;：:]+/).filter(term => term.length > 1);
+  if (!terms.length) return [];
+  return (state.knowledgeChunks ?? []).map(chunk => {
+    const haystack = `${chunk.title ?? ""} ${chunk.content}`.toLowerCase();
+    const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 + haystack.split(term).length - 2 : 0), 0);
+    return { ...chunk, score };
+  }).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.position - b.position).slice(0, limit);
+}
+
 function parseMultipart(req, uploadRoot) {
   return new Promise((resolve, reject) => {
     const fields = {};
@@ -135,7 +179,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       return json({
         teamConfig: state.teamConfig,
         dashboard: state.dashboard,
-        counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, finalReports: Object.keys(state.finalReports ?? {}).length },
+        counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, knowledgeSources: state.knowledgeSources?.length ?? 0, knowledgeChunks: state.knowledgeChunks?.length ?? 0, finalReports: Object.keys(state.finalReports ?? {}).length },
+        knowledgeSources: state.knowledgeSources ?? [],
         finalReports: Object.values(state.finalReports ?? {}),
         tasks: state.collab.tasks ?? [],
         recentEvidence: state.media.slice(0, 50),
@@ -220,7 +265,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
 
     if (pathname === "/api/knowledge") {
       if (req.method === "GET") {
-        if (searchParams.get("stats") === "1") return json({ totalChunks: state.knowledgeDocs.length + 128, customDocs: state.knowledgeDocs.length, byCategory: { workflow: 2, team: 1, route: 9, institution: 33, theme: 83, custom: state.knowledgeDocs.length } });
+        if (searchParams.get("stats") === "1") return json({ totalChunks: (state.knowledgeChunks?.length ?? 0) + state.knowledgeDocs.length, customDocs: state.knowledgeDocs.length, mountedSources: state.knowledgeSources?.length ?? 0, indexedChunks: state.knowledgeChunks?.length ?? 0, byCategory: { workflow: 2, team: 1, route: 7, source: state.knowledgeChunks?.length ?? 0, custom: state.knowledgeDocs.length } });
         return json({ docs: state.knowledgeDocs });
       }
       if (req.method === "POST") {
@@ -234,6 +279,35 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
         return json({ ok: true });
       }
     }
+    if (pathname === "/api/knowledge/sources" && req.method === "GET") return json({ sources: state.knowledgeSources ?? [], chunks: state.knowledgeChunks?.length ?? 0 });
+    if (pathname === "/api/knowledge/search" && req.method === "GET") return json({ query: searchParams.get("q") ?? "", results: searchKnowledge(state, searchParams.get("q"), Number(searchParams.get("limit") || 20)) });
+    if (pathname === "/api/knowledge/upload" && req.method === "POST") {
+      const { fields, file } = await parseMultipart(req, uploadRoot);
+      if (!file) return json({ error: "请选择要挂载的资料文件" }, 400);
+      const text = await extractDocument(file);
+      if (text.trim().length < 20) return json({ error: "资料中没有足够的可索引文字" }, 422);
+      const source = record({ groupId: fields.groupId || state.dashboard.groupId, title: fields.title || file.originalName, originalName: file.originalName, mimeType: file.mimeType, fileSize: file.size, status: "indexed", charCount: text.length, tags: String(fields.tags || "").split(/[,，、]/).map(item => item.trim()).filter(Boolean), uploadedBy: fields.uploadedBy || "组内成员" }, "source");
+      const blob = await persistBlob({ ...fields, groupId: source.groupId, memberId: fields.memberId || "knowledge", companyId: fields.companyId || "shared" }, file, "knowledge-source");
+      source.blobPathname = blob?.pathname;
+      const chunks = chunkDocument(text).map(item => record({ ...item, sourceId: source.id, title: source.title, tags: source.tags, groupId: source.groupId }, "chunk"));
+      await store.update(value => {
+        value.knowledgeSources ??= [];
+        value.knowledgeChunks ??= [];
+        value.knowledgeSources.unshift(source);
+        value.knowledgeChunks.push(...chunks);
+        value.knowledgeDocs.unshift(record({ title: source.title, content: chunks.slice(0, 2).map(item => item.content).join("\n\n"), tags: [...source.tags, "mounted-source"], sourceId: source.id, memberName: source.uploadedBy }, "knowledge"));
+      });
+      return json({ source, chunkCount: chunks.length }, 201);
+    }
+    if (pathname === "/api/knowledge/sources" && req.method === "DELETE") {
+      const id = searchParams.get("id");
+      await store.update(value => {
+        value.knowledgeSources = (value.knowledgeSources ?? []).filter(item => item.id !== id);
+        value.knowledgeChunks = (value.knowledgeChunks ?? []).filter(item => item.sourceId !== id);
+        value.knowledgeDocs = value.knowledgeDocs.filter(item => item.sourceId !== id);
+      });
+      return json({ ok: true });
+    }
 
     if (pathname === "/api/agent/feed" && req.method === "GET") {
       const since = searchParams.get("since");
@@ -243,6 +317,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/agent/chat" && req.method === "POST") {
       const input = await body(req);
       const context = evidenceContext(state, input.memberId, input.companyId);
+      const mountedKnowledge = searchKnowledge(state, input.message, 6);
+      if (mountedKnowledge.length) context.knowledge = [...mountedKnowledge, ...context.knowledge].slice(0, 10);
       const citations = context.knowledge.slice(0, 3).map(item => ({ id: item.id, title: item.title }));
       let reply;
       let mode = "knowledge";

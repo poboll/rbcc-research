@@ -1,5 +1,5 @@
 import React from "react";
-import { Archive, Bot, Compass, GraduationCap, LayoutDashboard, LayoutGrid, Monitor, MonitorPlay, Settings, SlidersHorizontal, Smartphone, Users } from "lucide-react";
+import { Archive, BookOpen, Bot, Compass, Download, GraduationCap, LayoutDashboard, LayoutGrid, Monitor, MonitorPlay, Settings, SlidersHorizontal, Smartphone, Users } from "lucide-react";
 import { navigate } from "../hooks.js";
 import { TEAM } from "../team.js";
 
@@ -7,9 +7,9 @@ const nav = [
   ["/screen", "协作大屏", Monitor], ["/screen/roadshow", "全功能路演", MonitorPlay], ["/design", "设计模式", SlidersHorizontal],
   ["/review", "教师评审", GraduationCap], ["/", "作战室", Compass], ["/collab", "协同 Hub", Users],
   ["/dashboard", "调研报告", LayoutDashboard], ["/traces", "留痕库", Archive], ["/library", "节点库", LayoutGrid],
-  ["/agent", "红小八", Bot], ["/app", "队员端", Smartphone], ["/admin", "管理端", Settings]
+  ["/agent", "红小八", Bot], ["/knowledge", "知识中心", BookOpen], ["/app", "队员端", Smartphone], ["/install", "安装", Download], ["/admin", "管理端", Settings]
 ];
-const moduleNav = [["/collab","协同 Hub"],["/review","评审"],["/","作战室"],["/library","节点库"],["/agent","红小八"],["/traces","留痕库"],["/dashboard","调研报告"],["/app","队员端"],["/admin","管理端"]];
+const moduleNav = [["/collab","协同 Hub"],["/review","评审"],["/","作战室"],["/library","节点库"],["/knowledge","知识中心"],["/agent","红小八"],["/traces","留痕库"],["/dashboard","调研报告"],["/app","队员端"],["/install","安装"],["/admin","管理端"]];
 
 function AppLink({ href, className, children, ...props }) {
   return <a href={href} className={className} onClick={event => { if (!event.metaKey && !event.ctrlKey) { event.preventDefault(); navigate(href); } }} {...props}>{children}</a>;
