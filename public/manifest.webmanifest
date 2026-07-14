@@ -1,0 +1,60 @@
+{
+  "id": "/app",
+  "name": "红鸟挑战营",
+  "short_name": "红鸟",
+  "description": "流光九径 · 小组协同 · 过程叙事 · 进度同步",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#020617",
+  "orientation": "portrait-primary",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "红小九",
+      "url": "/agent",
+      "description": "流光九径知识 Agent"
+    },
+    {
+      "name": "上传留痕",
+      "url": "/traces",
+      "description": "图片、文字、录音留痕库"
+    },
+    {
+      "name": "我的 App",
+      "url": "/app",
+      "description": "发布进度、上传留痕"
+    },
+    {
+      "name": "协同 Hub",
+      "url": "/collab",
+      "description": "查看各组进度"
+    },
+    {
+      "name": "作战室",
+      "url": "/",
+      "description": "探索之旅拓扑图"
+    }
+  ]
+}

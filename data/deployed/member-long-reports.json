@@ -1,0 +1,432 @@
+{
+  "member-duan": {
+    "memberId": "member-duan",
+    "memberName": "段辉",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式（对齐得实打印机模板）",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T04:10:36.029Z",
+    "reports": [
+      {
+        "companyId": "co-nansha-school",
+        "placeName": "南沙启慧学校",
+        "filename": "段辉-南沙启慧学校-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 11160,
+        "available": true
+      },
+      {
+        "companyId": "co-nansha-home",
+        "placeName": "南沙养老院",
+        "filename": "段辉-南沙养老院-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 11476,
+        "available": true
+      },
+      {
+        "companyId": "co-zhongke",
+        "placeName": "中科新知（海珠）",
+        "filename": "段辉-中科新知-调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 6296,
+        "available": true
+      },
+      {
+        "companyId": "co-chengzhi",
+        "placeName": "广州成至智能机器科技",
+        "filename": "段辉-成至智能-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 6136,
+        "available": true
+      },
+      {
+        "companyId": "co-songshan",
+        "placeName": "东莞松山湖光大 We 谷",
+        "filename": "段辉-松山湖-调研报告.docx",
+        "day": 2,
+        "groupModeId": "iterate",
+        "charCount": 14364,
+        "available": true
+      },
+      {
+        "companyId": "co-duan-sz-travel",
+        "placeName": "深圳三家旅行社联合调研",
+        "filename": "段辉-深圳三家旅行社-调研报告.docx",
+        "day": 3,
+        "groupModeId": "pioneer",
+        "charCount": 12255,
+        "available": true
+      }
+    ],
+    "available": true
+  },
+  "member-ye": {
+    "memberId": "member-ye",
+    "memberName": "叶泽瑞",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式 · 叶泽瑞实地调研报告",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T14:00:00.000Z",
+    "reports": [
+      {
+        "companyId": "co-jianghai-park",
+        "placeName": "江海区安全应急智能机器人产业园",
+        "documentTitle": "江门市江海区安全应急智能机器人产业园",
+        "filename": "叶泽瑞-江海产业园-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-dascom",
+        "placeName": "得实打印机（江门）",
+        "documentTitle": "得实打印机",
+        "filename": "叶泽瑞-得实打印机-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-jiaming",
+        "placeName": "广东夏朋机车科技",
+        "documentTitle": "广东夏朋机车科技有限公司",
+        "filename": "叶泽瑞-夏朋机车-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-yuewan-gu",
+        "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+        "documentTitle": "粤湾云谷产业创新孵化港",
+        "filename": "叶泽瑞-粤湾云谷-调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-robosense",
+        "placeName": "速腾聚创",
+        "documentTitle": "速腾聚创 RoboSense",
+        "filename": "叶泽瑞-速腾聚创-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-leju",
+        "placeName": "乐聚机器人",
+        "documentTitle": "乐聚智能（深圳）股份有限公司",
+        "filename": "叶泽瑞-乐聚智能-调研报告.docx",
+        "day": 2,
+        "groupModeId": "iterate",
+        "charCount": 11216,
+        "available": true
+      },
+      {
+        "companyId": "co-ye-kehua",
+        "placeName": "深圳市科华恒盛科技有限公司",
+        "documentTitle": "深圳市科华恒盛科技有限公司",
+        "filename": "叶泽瑞-科华恒盛-调研报告.docx",
+        "day": 2,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-ye-baoan-health",
+        "placeName": "宝安未来科技城社区健康服务站",
+        "documentTitle": "深圳市宝安区中心医院未来科技城社区健康服务站",
+        "filename": "叶泽瑞-宝安未来科技城社康-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-chase-light",
+        "placeName": "追光科技（黄埔）",
+        "documentTitle": "广州追光科技有限公司",
+        "filename": "叶泽瑞-追光科技-调研报告.docx",
+        "day": 3,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-anbiping",
+        "placeName": "广州安必平医药科技",
+        "documentTitle": "广州安必平医药科技股份有限公司",
+        "filename": "叶泽瑞-安必平-调研报告.docx",
+        "day": 3,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      }
+    ],
+    "available": true
+  },
+  "member-luo": {
+    "memberId": "member-luo",
+    "memberName": "罗子航",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式 · 罗子航实地调研报告",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T12:00:00.000Z",
+    "reports": [
+      {
+        "companyId": "co-jianghai-park",
+        "placeName": "江海区安全应急智能机器人产业园",
+        "documentTitle": "江门市江海区安全应急智能机器人产业园",
+        "filename": "罗子航-江海产业园-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-dascom",
+        "placeName": "得实打印机（江门）",
+        "documentTitle": "得实打印机",
+        "filename": "罗子航-得实打印机-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-jiaming",
+        "placeName": "广东夏朋机车科技",
+        "documentTitle": "广东夏朋机车科技",
+        "filename": "罗子航-夏朋机车-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-yuewan-gu",
+        "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+        "documentTitle": "粤湾云谷产业创新孵化港",
+        "filename": "罗子航-粤湾云谷-调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-tupai",
+        "placeName": "佛山淦源科技公司",
+        "documentTitle": "淦源智能科技",
+        "filename": "罗子航-淦源智能-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-chase-light",
+        "placeName": "追光科技（黄埔）",
+        "documentTitle": "广州追光科技有限公司",
+        "filename": "罗子航-追光科技-调研报告.docx",
+        "day": 3,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-anbiping",
+        "placeName": "广州安必平医药科技",
+        "documentTitle": "广州安必平医药科技股份有限公司",
+        "filename": "罗子航-安必平医药-调研报告.docx",
+        "day": 3,
+        "groupModeId": "iterate",
+        "charCount": 10000,
+        "available": true
+      },
+      {
+        "companyId": "co-gz-free",
+        "placeName": "科学城云升科学园（黄埔自由调研）",
+        "documentTitle": "广州黄埔科学城科学园",
+        "filename": "罗子航-云升科学园-调研报告.docx",
+        "day": 3,
+        "groupModeId": "pioneer",
+        "charCount": 10000,
+        "available": true
+      }
+    ],
+    "available": true
+  },
+  "member-chen": {
+    "memberId": "member-chen",
+    "memberName": "陈佳卉",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式 · 陈佳卉实地调研报告",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T16:00:00.000Z",
+    "reports": [
+      {
+        "companyId": "co-chen-panfu-community",
+        "placeName": "盘福路社区",
+        "documentTitle": "盘福路社区老旧社区体系调研",
+        "filename": "陈佳卉-盘福路社区-调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 13292,
+        "available": true
+      }
+    ],
+    "available": true
+  },
+  "member-wang": {
+    "memberId": "member-wang",
+    "memberName": "王馨妍",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式 · 王馨妍实地调研报告",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T04:14:53.451Z",
+    "reports": [
+      {
+        "companyId": "co-fabric-market",
+        "placeName": "中大布匹市场",
+        "documentTitle": "中大布匹市场",
+        "filename": "王馨妍-中大布匹市场-调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 9979,
+        "available": true
+      },
+      {
+        "companyId": "co-robosense",
+        "placeName": "速腾聚创",
+        "documentTitle": "速腾聚创",
+        "filename": "王馨妍-速腾聚创-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 10145,
+        "available": true
+      },
+      {
+        "companyId": "co-edge",
+        "placeName": "边缘创智",
+        "documentTitle": "边缘创智科技（南山智城 A2）",
+        "filename": "王馨妍-边缘创智-调研报告.docx",
+        "day": 2,
+        "groupModeId": "iterate",
+        "charCount": 12676,
+        "available": true
+      },
+      {
+        "companyId": "co-wang-tencent-future",
+        "placeName": "腾讯「互联网+」未来科技城",
+        "documentTitle": "腾讯「互联网+」未来科技城",
+        "filename": "王馨妍-腾讯未来科技城-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 10688,
+        "available": true
+      },
+      {
+        "companyId": "co-wang-baoan-health",
+        "placeName": "宝安未来科技城社康",
+        "documentTitle": "深圳市宝安区中心医院未来科技城社区健康服务站",
+        "filename": "王馨妍-宝安未来科技城社康-调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 17706,
+        "available": true
+      },
+      {
+        "companyId": "co-wang-tianzhu",
+        "placeName": "天铸军事体育",
+        "documentTitle": "天铸军事体育教育平台（天铸控股）",
+        "filename": "王馨妍-天铸军事体育-调研报告.docx",
+        "day": 3,
+        "groupModeId": "iterate",
+        "charCount": 10856,
+        "available": true
+      },
+      {
+        "companyId": "co-wang-ziwei",
+        "placeName": "广州子为役前拓展",
+        "documentTitle": "广州子为役前拓展训练有限公司",
+        "filename": "王馨妍-广州子为役前拓展-调研报告.docx",
+        "day": 3,
+        "groupModeId": "pioneer",
+        "charCount": 11403,
+        "available": true
+      }
+    ],
+    "available": true
+  },
+  "team-9": {
+    "memberId": "team-9",
+    "memberName": "流光九径第九组",
+    "template": "rbcc",
+    "templateLabel": "RBCC 五段式 · 第九组五大场景整合调研报告",
+    "targetChars": 10000,
+    "generatedAt": "2026-06-26T04:14:53.765Z",
+    "reports": [
+      {
+        "companyId": "theme-healthcare",
+        "placeName": "医疗健康与居家照护场景",
+        "documentTitle": "医疗健康与居家照护场景",
+        "filename": "第九组-医疗健康与居家照护场景-整合调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 15115,
+        "available": true
+      },
+      {
+        "companyId": "theme-education",
+        "placeName": "教育与培训场景",
+        "documentTitle": "教育与培训场景",
+        "filename": "第九组-教育与培训场景-整合调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 11292,
+        "available": true
+      },
+      {
+        "companyId": "theme-public-service",
+        "placeName": "公共服务与城市空间场景",
+        "documentTitle": "公共服务与城市空间场景",
+        "filename": "第九组-公共服务与城市空间场景-整合调研报告.docx",
+        "day": 1,
+        "groupModeId": "pioneer",
+        "charCount": 16614,
+        "available": true
+      },
+      {
+        "companyId": "theme-creative",
+        "placeName": "创意与内容产业场景",
+        "documentTitle": "创意与内容产业场景",
+        "filename": "第九组-创意与内容产业场景-整合调研报告.docx",
+        "day": 2,
+        "groupModeId": "pioneer",
+        "charCount": 11599,
+        "available": true
+      },
+      {
+        "companyId": "theme-manufacturing",
+        "placeName": "装备制造加工和装配场景",
+        "documentTitle": "装备制造加工和装配场景",
+        "filename": "第九组-装备制造加工和装配场景-整合调研报告.docx",
+        "day": 1,
+        "groupModeId": "iterate",
+        "charCount": 18079,
+        "available": true
+      }
+    ],
+    "available": true
+  }
+}

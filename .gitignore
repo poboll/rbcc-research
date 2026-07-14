@@ -1,0 +1,11 @@
+node_modules/
+web-dist/
+.env
+.env.local
+data/uploads/
+data/generated/
+data/app-state.json
+data/archive/
+.vercel/
+.DS_Store
+npm-debug.log*

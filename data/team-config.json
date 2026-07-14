@@ -1,0 +1,83 @@
+{
+  "group": {
+    "id": "team-8",
+    "name": "红八宝 · 八爪鱼组",
+    "shortName": "红八宝",
+    "mascot": "八爪鱼组",
+    "event": "2026 RBCC 企业调研",
+    "theme": "第八组"
+  },
+  "members": [
+    { "id": "member-jin", "name": "金俊烯", "role": "调研员" },
+    { "id": "member-lin", "name": "林耿标", "role": "调研员" },
+    { "id": "member-zhong", "name": "钟宝怡", "role": "调研员" },
+    { "id": "member-han", "name": "韩昆桦", "role": "调研员" },
+    { "id": "member-su", "name": "苏增烨", "role": "调研员" }
+  ],
+  "routes": [
+    {
+      "id": "day1-route1", "day": 1, "date": "2026-07-14", "label": "线路1", "capacity": 60,
+      "memberIds": ["member-jin", "member-lin", "member-zhong"],
+      "stops": [
+        { "companyId": "co-xinyuan-logistics", "companyName": "信源物流", "themeName": "物流生产与研发制造", "activity": "生产线参观 + 研发制造交流" },
+        { "companyId": "co-zhongke", "companyName": "中科新知（海珠）", "themeName": "医疗健康与无感监测", "activity": "企业参访与技术交流" },
+        { "companyId": "co-chengzhi", "companyName": "广州成至智能机器人科技", "themeName": "智能机器人与公共安全", "activity": "企业参访与技术交流" }
+      ]
+    },
+    {
+      "id": "day1-route2", "day": 1, "date": "2026-07-14", "label": "线路2", "capacity": 60,
+      "memberIds": ["member-han", "member-su"],
+      "stops": [
+        { "companyId": "co-gba-equipment-park", "companyName": "工控大湾区高端装备产业园", "themeName": "高端装备与产业园区", "activity": "园区介绍" },
+        { "companyId": "co-guangchai", "companyName": "广柴股份", "themeName": "装备制造加工和装配", "activity": "工厂参观" },
+        { "companyId": "co-crchi", "companyName": "中铁装备", "themeName": "高端装备与工程机械", "activity": "工厂参观" },
+        { "companyId": "co-cscec-tech", "companyName": "中建科技", "themeName": "智能建造与绿色建筑", "activity": "工厂参观" },
+        { "companyId": "co-kingsons", "companyName": "金圣斯科技箱包", "themeName": "箱包制造与产品创新", "activity": "企业参访" }
+      ]
+    },
+    {
+      "id": "day2-route1-1", "day": 2, "date": "2026-07-15", "label": "线路1-1", "capacity": 30,
+      "memberIds": ["member-lin", "member-su"],
+      "stops": [
+        { "companyId": "co-robosense", "companyName": "速腾聚创", "themeName": "机器人与激光雷达", "activity": "机器人企业参访" },
+        { "companyId": "co-nanshan-zhigu", "companyName": "南山智谷创业园", "themeName": "创新创业生态", "activity": "下午自由调研", "meetingPoint": "南山智谷创业园" }
+      ]
+    },
+    {
+      "id": "day2-route1-2", "day": 2, "date": "2026-07-15", "label": "线路1-2", "capacity": 30,
+      "memberIds": ["member-han"],
+      "stops": [
+        { "companyId": "co-8bitdo", "companyName": "八位堂", "themeName": "游戏硬件与人机交互", "activity": "游戏手柄公司参观 + 技术交流" },
+        { "companyId": "co-nanwan-huiku", "companyName": "南湾慧库", "themeName": "创新创业生态", "activity": "自由调研" }
+      ]
+    },
+    {
+      "id": "day2-route2", "day": 2, "date": "2026-07-15", "label": "线路2", "capacity": 60,
+      "memberIds": ["member-jin", "member-zhong"],
+      "stops": [
+        { "companyId": "co-jiangcun", "companyName": "佛山北滘江村", "themeName": "社区营造与古建筑活化", "activity": "村落参访" },
+        { "companyId": "co-hechuang-fund", "companyName": "和创基金", "themeName": "社区基金与协同治理", "activity": "社区营造交流" },
+        { "companyId": "co-fujin-yingzao", "companyName": "附近营造", "themeName": "社区营造与空间设计", "activity": "社区营造交流" },
+        { "companyId": "co-sishixia", "companyName": "四时夏", "themeName": "古建筑活化与社区文化", "activity": "古建筑活化交流" }
+      ]
+    },
+    {
+      "id": "day3-route1", "day": 3, "date": "2026-07-16", "label": "线路1", "capacity": 60,
+      "memberIds": ["member-lin", "member-zhong"],
+      "stops": [
+        { "companyId": "co-anbiping", "companyName": "广州安必平医药科技", "themeName": "医疗健康与病理诊断", "activity": "生产线参观 + 研发技术交流" },
+        { "companyId": "co-panfu-community", "companyName": "盘福路荔湾社区", "themeName": "公共服务与社区治理", "activity": "自由调研" },
+        { "companyId": "co-fabric-market", "companyName": "中大布匹市场", "themeName": "纺织供应链与市场数字化", "activity": "自由调研" }
+      ]
+    },
+    {
+      "id": "day3-route2", "day": 3, "date": "2026-07-16", "label": "线路2", "capacity": 60,
+      "memberIds": ["member-han", "member-jin", "member-su"],
+      "stops": [
+        { "companyId": "co-dascom", "companyName": "得实打印机有限公司", "themeName": "装备制造与打印技术", "activity": "企业参访", "time": "10:15-12:00" },
+        { "companyId": "co-xiapeng-motor", "companyName": "广东夏朋机车科技有限公司", "themeName": "机车制造与产品研发", "activity": "企业参访", "time": "14:00-15:30" },
+        { "companyId": "co-yuewan-gu", "companyName": "粤湾云谷产业创新孵化港", "themeName": "产业创新与孵化服务", "activity": "自由调研", "time": "15:30后", "meetingPoint": "17:30 回程集合" }
+      ]
+    }
+  ]
+}

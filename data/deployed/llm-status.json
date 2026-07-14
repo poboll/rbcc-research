@@ -1,0 +1,8 @@
+{
+  "configured": true,
+  "provider": "DeepSeek",
+  "model": "deepseek-chat",
+  "reportModel": "deepseek-chat",
+  "reportBlockMaxTokens": 3200,
+  "reportPartMaxTokens": 2800
+}

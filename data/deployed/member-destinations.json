@@ -1,0 +1,89 @@
+{
+  "member-duan": {
+    "memberId": "member-duan",
+    "companyIds": [
+      "co-nansha-school",
+      "co-nansha-home",
+      "co-zhongke",
+      "co-chengzhi",
+      "co-songshan",
+      "co-duan-sz-travel",
+      "co-gz-free"
+    ],
+    "routeConfirmed": true,
+    "confirmedAt": "2026-06-22T12:01:57.896Z",
+    "updatedAt": "2026-06-25T19:13:59.058Z"
+  },
+  "member-ye": {
+    "memberId": "member-ye",
+    "companyIds": [
+      "co-jianghai-park",
+      "co-dascom",
+      "co-jiaming",
+      "co-yuewan-gu",
+      "co-robosense",
+      "co-leju",
+      "co-ye-kehua",
+      "co-ye-baoan-health",
+      "co-sz-free",
+      "co-chase-light",
+      "co-anbiping",
+      "co-gz-free"
+    ],
+    "routeConfirmed": true,
+    "confirmedAt": "2026-06-22T12:01:57.896Z",
+    "updatedAt": "2026-06-25T19:13:59.159Z"
+  },
+  "member-luo": {
+    "memberId": "member-luo",
+    "companyIds": [
+      "co-jianghai-park",
+      "co-dascom",
+      "co-jiaming",
+      "co-yuewan-gu",
+      "co-tupai",
+      "co-chase-light",
+      "co-anbiping",
+      "co-gz-free",
+      "co-xianyong",
+      "co-fs-free"
+    ],
+    "routeConfirmed": true,
+    "confirmedAt": "2026-06-22T12:01:57.897Z",
+    "updatedAt": "2026-06-25T18:58:18.107Z"
+  },
+  "member-chen": {
+    "memberId": "member-chen",
+    "companyIds": [
+      "co-chen-panfu-community",
+      "co-chen-panfu-hospital",
+      "co-xianyong",
+      "co-huadu-digital",
+      "co-kingsons",
+      "co-huadu-leather",
+      "co-fabric-market",
+      "co-tupai",
+      "co-fs-free"
+    ],
+    "routeConfirmed": true,
+    "confirmedAt": "2026-06-22T12:01:57.898Z",
+    "updatedAt": "2026-06-25T18:57:41.526Z"
+  },
+  "member-wang": {
+    "memberId": "member-wang",
+    "companyIds": [
+      "co-fabric-market",
+      "co-robosense",
+      "co-edge",
+      "co-wang-tencent-future",
+      "co-wang-baoan-health",
+      "co-wang-tianzhu",
+      "co-wang-ziwei",
+      "co-sz-free",
+      "co-gz-free"
+    ],
+    "routeConfirmed": true,
+    "confirmedAt": "2026-06-22T12:01:57.898Z",
+    "updatedAt": "2026-06-25T16:00:52.030Z"
+  }
+}

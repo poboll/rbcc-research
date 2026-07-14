@@ -1,0 +1,1268 @@
+{
+  "member-duan": {
+    "memberId": "member-duan",
+    "generatedAt": "2026-06-26T04:10:22.659Z",
+    "versions": [
+      {
+        "id": "v1-field",
+        "label": "走访初稿",
+        "stage": "阶段1",
+        "day": 1,
+        "summary": "刚回驻地：现场笔记 + 1 条原声，痛点与对策基本空白",
+        "changes": [
+          "写入调研对象与参访时段",
+          "补 1–2 条田野笔记或访谈原声",
+          "预设假设列出但未验证"
+        ],
+        "avgPercent": 26,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-nansha-school",
+            "placeName": "南沙启慧学校",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-nansha-home",
+            "placeName": "南沙养老院",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 31
+          },
+          {
+            "companyId": "co-zhongke",
+            "placeName": "中科新知（海珠）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-chengzhi",
+            "placeName": "广州成至智能机器科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-songshan",
+            "placeName": "东莞松山湖光大 We 谷",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-duan-sz-travel",
+            "placeName": "深圳三家旅行社联合调研",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 25
+          }
+        ]
+      },
+      {
+        "id": "v2-align",
+        "label": "组内对齐",
+        "stage": "阶段2",
+        "day": 2,
+        "summary": "组内碰头后：利益相关者与部分痛点验证补齐，方案仍空",
+        "changes": [
+          "现状板块扩至业务/流程观察",
+          "共情侧补充 2–3 类角色诉求",
+          "痛点证据链开始对照，POV 尚未收敛"
+        ],
+        "avgPercent": 70,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-nansha-school",
+            "placeName": "南沙启慧学校",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-nansha-home",
+            "placeName": "南沙养老院",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 75
+          },
+          {
+            "companyId": "co-zhongke",
+            "placeName": "中科新知（海珠）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-chengzhi",
+            "placeName": "广州成至智能机器科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-songshan",
+            "placeName": "东莞松山湖光大 We 谷",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-duan-sz-travel",
+            "placeName": "深圳三家旅行社联合调研",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 69
+          }
+        ]
+      },
+      {
+        "id": "v3-rich",
+        "label": "四核丰满",
+        "stage": "阶段3",
+        "day": 3,
+        "summary": "四板块基本写满，对策框架已有，万字 RBCC Word 仍在统稿",
+        "changes": [
+          "痛点归类与 HMW 方向明确",
+          "机会域与方案构想初稿完成",
+          "附录与参考文献待并入 Word"
+        ],
+        "avgPercent": 89,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-nansha-school",
+            "placeName": "南沙启慧学校",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-nansha-home",
+            "placeName": "南沙养老院",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-zhongke",
+            "placeName": "中科新知（海珠）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-chengzhi",
+            "placeName": "广州成至智能机器科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-songshan",
+            "placeName": "东莞松山湖光大 We 谷",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-duan-sz-travel",
+            "placeName": "深圳三家旅行社联合调研",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 88
+          }
+        ]
+      },
+      {
+        "id": "v4-final",
+        "label": "定稿 · 万字 RBCC",
+        "stage": "阶段4",
+        "day": 3,
+        "summary": "与正式 Word 调研报告一致，四核在线稿同步定稿",
+        "changes": [
+          "RBCC 五段式正文完整（设计→概览→共情→定义→构思）",
+          "证据链、Persona、评估矩阵全部入稿",
+          "App 四核与 Word 同源，可在线阅读全文"
+        ],
+        "avgPercent": 95,
+        "isFinal": true,
+        "wordAligned": true,
+        "sites": [
+          {
+            "companyId": "co-nansha-school",
+            "placeName": "南沙启慧学校",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-nansha-home",
+            "placeName": "南沙养老院",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-zhongke",
+            "placeName": "中科新知（海珠）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 94
+          },
+          {
+            "companyId": "co-chengzhi",
+            "placeName": "广州成至智能机器科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-songshan",
+            "placeName": "东莞松山湖光大 We 谷",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-duan-sz-travel",
+            "placeName": "深圳三家旅行社联合调研",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 94
+          }
+        ]
+      }
+    ]
+  },
+  "member-ye": {
+    "memberId": "member-ye",
+    "generatedAt": "2026-06-26T02:37:48.933Z",
+    "versions": [
+      {
+        "id": "v1-field",
+        "label": "走访初稿",
+        "stage": "阶段1",
+        "day": 1,
+        "summary": "刚回驻地：现场笔记 + 1 条原声，痛点与对策基本空白",
+        "changes": [
+          "写入调研对象与参访时段",
+          "补 1–2 条田野笔记或访谈原声",
+          "预设假设列出但未验证"
+        ],
+        "avgPercent": 26,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-leju",
+            "placeName": "乐聚机器人",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 31
+          },
+          {
+            "companyId": "co-ye-kehua",
+            "placeName": "深圳市科华恒盛科技有限公司",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-ye-baoan-health",
+            "placeName": "宝安未来科技城社区健康服务站",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 31
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 25
+          }
+        ]
+      },
+      {
+        "id": "v2-align",
+        "label": "组内对齐",
+        "stage": "阶段2",
+        "day": 2,
+        "summary": "组内碰头后：利益相关者与部分痛点验证补齐，方案仍空",
+        "changes": [
+          "现状板块扩至业务/流程观察",
+          "共情侧补充 2–3 类角色诉求",
+          "痛点证据链开始对照，POV 尚未收敛"
+        ],
+        "avgPercent": 70,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-leju",
+            "placeName": "乐聚机器人",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 75
+          },
+          {
+            "companyId": "co-ye-kehua",
+            "placeName": "深圳市科华恒盛科技有限公司",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-ye-baoan-health",
+            "placeName": "宝安未来科技城社区健康服务站",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 75
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 69
+          }
+        ]
+      },
+      {
+        "id": "v3-rich",
+        "label": "四核丰满",
+        "stage": "阶段3",
+        "day": 3,
+        "summary": "四板块基本写满，对策框架已有，万字 RBCC Word 仍在统稿",
+        "changes": [
+          "痛点归类与 HMW 方向明确",
+          "机会域与方案构想初稿完成",
+          "附录与参考文献待并入 Word"
+        ],
+        "avgPercent": 89,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-leju",
+            "placeName": "乐聚机器人",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-ye-kehua",
+            "placeName": "深圳市科华恒盛科技有限公司",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-ye-baoan-health",
+            "placeName": "宝安未来科技城社区健康服务站",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 94
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 88
+          }
+        ]
+      },
+      {
+        "id": "v4-final",
+        "label": "定稿 · 万字 RBCC",
+        "stage": "阶段4",
+        "day": 3,
+        "summary": "与正式 Word 调研报告一致，四核在线稿同步定稿",
+        "changes": [
+          "RBCC 五段式正文完整（设计→概览→共情→定义→构思）",
+          "证据链、Persona、评估矩阵全部入稿",
+          "App 四核与 Word 同源，可在线阅读全文"
+        ],
+        "avgPercent": 100,
+        "isFinal": true,
+        "wordAligned": true,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-leju",
+            "placeName": "乐聚机器人",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-ye-kehua",
+            "placeName": "深圳市科华恒盛科技有限公司",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-ye-baoan-health",
+            "placeName": "宝安未来科技城社区健康服务站",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 100
+          }
+        ]
+      }
+    ]
+  },
+  "member-luo": {
+    "memberId": "member-luo",
+    "generatedAt": "2026-06-25T18:03:06.222Z",
+    "versions": [
+      {
+        "id": "v1-field",
+        "label": "走访初稿",
+        "stage": "阶段1",
+        "day": 1,
+        "summary": "刚回驻地：现场笔记 + 1 条原声，痛点与对策基本空白",
+        "changes": [
+          "写入调研对象与参访时段",
+          "补 1–2 条田野笔记或访谈原声",
+          "预设假设列出但未验证"
+        ],
+        "avgPercent": 26,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-tupai",
+            "placeName": "佛山淦源科技公司",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 31
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-gz-free",
+            "placeName": "科学城云升科学园（黄埔自由调研）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 25
+          }
+        ]
+      },
+      {
+        "id": "v2-align",
+        "label": "组内对齐",
+        "stage": "阶段2",
+        "day": 2,
+        "summary": "组内碰头后：利益相关者与部分痛点验证补齐，方案仍空",
+        "changes": [
+          "现状板块扩至业务/流程观察",
+          "共情侧补充 2–3 类角色诉求",
+          "痛点证据链开始对照，POV 尚未收敛"
+        ],
+        "avgPercent": 70,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-tupai",
+            "placeName": "佛山淦源科技公司",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 75
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-gz-free",
+            "placeName": "科学城云升科学园（黄埔自由调研）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 69
+          }
+        ]
+      },
+      {
+        "id": "v3-rich",
+        "label": "四核丰满",
+        "stage": "阶段3",
+        "day": 3,
+        "summary": "四板块基本写满，对策框架已有，万字 RBCC Word 仍在统稿",
+        "changes": [
+          "痛点归类与 HMW 方向明确",
+          "机会域与方案构想初稿完成",
+          "附录与参考文献待并入 Word"
+        ],
+        "avgPercent": 89,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-tupai",
+            "placeName": "佛山淦源科技公司",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 94
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-gz-free",
+            "placeName": "科学城云升科学园（黄埔自由调研）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 88
+          }
+        ]
+      },
+      {
+        "id": "v4-final",
+        "label": "定稿 · 万字 RBCC",
+        "stage": "阶段4",
+        "day": 3,
+        "summary": "与正式 Word 调研报告一致，四核在线稿同步定稿",
+        "changes": [
+          "RBCC 五段式正文完整（设计→概览→共情→定义→构思）",
+          "证据链、Persona、评估矩阵全部入稿",
+          "App 四核与 Word 同源，可在线阅读全文"
+        ],
+        "avgPercent": 100,
+        "isFinal": true,
+        "wordAligned": true,
+        "sites": [
+          {
+            "companyId": "co-jianghai-park",
+            "placeName": "江海区安全应急智能机器人产业园",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-dascom",
+            "placeName": "得实打印机（江门）",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-jiaming",
+            "placeName": "广东夏朋机车科技",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-yuewan-gu",
+            "placeName": "粤湾云谷产业创新孵化港（自由调研）",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-tupai",
+            "placeName": "佛山淦源科技公司",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-chase-light",
+            "placeName": "追光科技（黄埔）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-anbiping",
+            "placeName": "广州安必平医药科技",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-gz-free",
+            "placeName": "科学城云升科学园（黄埔自由调研）",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 100
+          }
+        ]
+      }
+    ]
+  },
+  "member-chen": {
+    "memberId": "member-chen",
+    "generatedAt": "2026-06-26T02:43:08.860Z",
+    "versions": [
+      {
+        "id": "v1-field",
+        "label": "走访初稿",
+        "stage": "阶段1",
+        "day": 1,
+        "summary": "刚回驻地：现场笔记 + 1 条原声，痛点与对策基本空白",
+        "changes": [
+          "写入调研对象与参访时段",
+          "补 1–2 条田野笔记或访谈原声",
+          "预设假设列出但未验证"
+        ],
+        "avgPercent": 25,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-chen-panfu-community",
+            "placeName": "盘福路社区",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 25
+          }
+        ]
+      },
+      {
+        "id": "v2-align",
+        "label": "组内对齐",
+        "stage": "阶段2",
+        "day": 2,
+        "summary": "组内碰头后：利益相关者与部分痛点验证补齐，方案仍空",
+        "changes": [
+          "现状板块扩至业务/流程观察",
+          "共情侧补充 2–3 类角色诉求",
+          "痛点证据链开始对照，POV 尚未收敛"
+        ],
+        "avgPercent": 69,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-chen-panfu-community",
+            "placeName": "盘福路社区",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 69
+          }
+        ]
+      },
+      {
+        "id": "v3-rich",
+        "label": "四核丰满",
+        "stage": "阶段3",
+        "day": 3,
+        "summary": "四板块基本写满，对策框架已有，万字 RBCC Word 仍在统稿",
+        "changes": [
+          "痛点归类与 HMW 方向明确",
+          "机会域与方案构想初稿完成",
+          "附录与参考文献待并入 Word"
+        ],
+        "avgPercent": 88,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-chen-panfu-community",
+            "placeName": "盘福路社区",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 88
+          }
+        ]
+      },
+      {
+        "id": "v4-final",
+        "label": "定稿 · 万字 RBCC",
+        "stage": "阶段4",
+        "day": 3,
+        "summary": "与正式 Word 调研报告一致，四核在线稿同步定稿",
+        "changes": [
+          "RBCC 五段式正文完整（设计→概览→共情→定义→构思）",
+          "证据链、Persona、评估矩阵全部入稿",
+          "App 四核与 Word 同源，可在线阅读全文"
+        ],
+        "avgPercent": 100,
+        "isFinal": true,
+        "wordAligned": true,
+        "sites": [
+          {
+            "companyId": "co-chen-panfu-community",
+            "placeName": "盘福路社区",
+            "day": 1,
+            "groupModeId": "pioneer",
+            "percent": 100
+          }
+        ]
+      }
+    ]
+  },
+  "member-wang": {
+    "memberId": "member-wang",
+    "generatedAt": "2026-06-26T04:14:46.712Z",
+    "versions": [
+      {
+        "id": "v1-field",
+        "label": "走访初稿",
+        "stage": "阶段1",
+        "day": 1,
+        "summary": "刚回驻地：现场笔记 + 1 条原声，痛点与对策基本空白",
+        "changes": [
+          "写入调研对象与参访时段",
+          "补 1–2 条田野笔记或访谈原声",
+          "预设假设列出但未验证"
+        ],
+        "avgPercent": 28,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-fabric-market",
+            "placeName": "中大布匹市场",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 31
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-edge",
+            "placeName": "边缘创智",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 25
+          },
+          {
+            "companyId": "co-wang-tencent-future",
+            "placeName": "腾讯「互联网+」未来科技城",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-wang-baoan-health",
+            "placeName": "宝安未来科技城社康",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 25
+          },
+          {
+            "companyId": "co-wang-tianzhu",
+            "placeName": "天铸军事体育",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 31
+          },
+          {
+            "companyId": "co-wang-ziwei",
+            "placeName": "广州子为役前拓展",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 31
+          }
+        ]
+      },
+      {
+        "id": "v2-align",
+        "label": "组内对齐",
+        "stage": "阶段2",
+        "day": 2,
+        "summary": "组内碰头后：利益相关者与部分痛点验证补齐，方案仍空",
+        "changes": [
+          "现状板块扩至业务/流程观察",
+          "共情侧补充 2–3 类角色诉求",
+          "痛点证据链开始对照，POV 尚未收敛"
+        ],
+        "avgPercent": 72,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-fabric-market",
+            "placeName": "中大布匹市场",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 75
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-edge",
+            "placeName": "边缘创智",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 69
+          },
+          {
+            "companyId": "co-wang-tencent-future",
+            "placeName": "腾讯「互联网+」未来科技城",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-wang-baoan-health",
+            "placeName": "宝安未来科技城社康",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 69
+          },
+          {
+            "companyId": "co-wang-tianzhu",
+            "placeName": "天铸军事体育",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 75
+          },
+          {
+            "companyId": "co-wang-ziwei",
+            "placeName": "广州子为役前拓展",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 75
+          }
+        ]
+      },
+      {
+        "id": "v3-rich",
+        "label": "四核丰满",
+        "stage": "阶段3",
+        "day": 3,
+        "summary": "四板块基本写满，对策框架已有，万字 RBCC Word 仍在统稿",
+        "changes": [
+          "痛点归类与 HMW 方向明确",
+          "机会域与方案构想初稿完成",
+          "附录与参考文献待并入 Word"
+        ],
+        "avgPercent": 91,
+        "isFinal": false,
+        "wordAligned": false,
+        "sites": [
+          {
+            "companyId": "co-fabric-market",
+            "placeName": "中大布匹市场",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-edge",
+            "placeName": "边缘创智",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 88
+          },
+          {
+            "companyId": "co-wang-tencent-future",
+            "placeName": "腾讯「互联网+」未来科技城",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-wang-baoan-health",
+            "placeName": "宝安未来科技城社康",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 88
+          },
+          {
+            "companyId": "co-wang-tianzhu",
+            "placeName": "天铸军事体育",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 94
+          },
+          {
+            "companyId": "co-wang-ziwei",
+            "placeName": "广州子为役前拓展",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 94
+          }
+        ]
+      },
+      {
+        "id": "v4-final",
+        "label": "定稿 · 万字 RBCC",
+        "stage": "阶段4",
+        "day": 3,
+        "summary": "与正式 Word 调研报告一致，四核在线稿同步定稿",
+        "changes": [
+          "RBCC 五段式正文完整（设计→概览→共情→定义→构思）",
+          "证据链、Persona、评估矩阵全部入稿",
+          "App 四核与 Word 同源，可在线阅读全文"
+        ],
+        "avgPercent": 100,
+        "isFinal": true,
+        "wordAligned": true,
+        "sites": [
+          {
+            "companyId": "co-fabric-market",
+            "placeName": "中大布匹市场",
+            "day": 1,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-robosense",
+            "placeName": "速腾聚创",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-edge",
+            "placeName": "边缘创智",
+            "day": 2,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-wang-tencent-future",
+            "placeName": "腾讯「互联网+」未来科技城",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-wang-baoan-health",
+            "placeName": "宝安未来科技城社康",
+            "day": 2,
+            "groupModeId": "pioneer",
+            "percent": 100
+          },
+          {
+            "companyId": "co-wang-tianzhu",
+            "placeName": "天铸军事体育",
+            "day": 3,
+            "groupModeId": "iterate",
+            "percent": 100
+          },
+          {
+            "companyId": "co-wang-ziwei",
+            "placeName": "广州子为役前拓展",
+            "day": 3,
+            "groupModeId": "pioneer",
+            "percent": 100
+          }
+        ]
+      }
+    ]
+  }
+}
