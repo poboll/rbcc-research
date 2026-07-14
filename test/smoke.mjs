@@ -23,13 +23,15 @@ async function expectOk(path, options) {
 
 try {
   await waitForServer();
-  const routes = ["/", "/screen", "/screen/roadshow", "/design", "/review", "/review/report?memberId=member-jin&companyId=co-xinyuan-logistics", "/app", "/library", "/agent", "/traces", "/dashboard", "/collab"];
+  const routes = ["/", "/screen", "/screen/roadshow", "/design", "/review", "/review/report?memberId=member-jin&companyId=co-xinyuan-logistics", "/app", "/library", "/agent", "/traces", "/dashboard", "/collab", "/admin"];
   for (const route of routes) {
     const html = await (await expectOk(route)).text();
     if (!html.includes('id="root"') || !html.includes('/assets/')) throw new Error(`${route}: not served by the React source build`);
   }
   const team = await (await expectOk("/api/team-config")).json();
   if (team.group?.id !== "team-8" || team.members?.length !== 5 || team.routes?.length !== 7) throw new Error("team config migration mismatch");
+  const admin = await (await expectOk("/api/admin/summary")).json();
+  if (admin.counts?.members !== 5 || admin.counts?.assignments !== 48) throw new Error("admin summary contract mismatch");
   const dashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   if (dashboard.members?.length !== 1 || dashboard.members[0].sites?.length !== 10 || dashboard.summary?.siteAssignmentCount !== 48 || dashboard.summary?.uniqueSiteCount !== 22) throw new Error("dashboard member/site contract mismatch");
   const report = await (await expectOk("/api/research-report?memberId=member-jin&companyId=co-xinyuan-logistics&groupModeId=iterate")).json();
@@ -40,7 +42,7 @@ try {
   if (!(docx.headers.get("content-type") ?? "").includes("wordprocessingml")) throw new Error("docx content type mismatch");
   const bytes = new Uint8Array(await docx.arrayBuffer());
   if (bytes[0] !== 0x50 || bytes[1] !== 0x4b) throw new Error("docx is not a ZIP package");
-  console.log("smoke: 12 pages, team-8 routes, dashboard, report, agent fallback, and DOCX passed");
+  console.log("smoke: 13 pages, admin, team-8 routes, dashboard, report, agent fallback, and DOCX passed");
 } finally {
   server.kill("SIGTERM");
   await Promise.race([once(server, "exit"), new Promise(resolve => setTimeout(resolve, 1000))]);

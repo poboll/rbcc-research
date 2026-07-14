@@ -1,5 +1,5 @@
 import Busboy from "busboy";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { createReportDocx } from "./docx.mjs";
 import { complete, extractJson, llmStatus } from "./llm.mjs";
@@ -98,6 +98,15 @@ function suggestedQuestions(companyName = "该站点") {
   return themes.map((text, index) => ({ id: `suggest-${Date.now()}-${index}`, text: `${companyName}：${text}`, tags: [index < 2 ? "现状" : index < 4 ? "痛点" : "对策"], lens: "pending" }));
 }
 
+function requireAdmin(req) {
+  const expected = process.env.ADMIN_TOKEN;
+  if (!expected) {
+    if (process.env.VERCEL || process.env.NODE_ENV === "production") throw Object.assign(new Error("管理端尚未配置 ADMIN_TOKEN"), { status: 503 });
+    return;
+  }
+  if (req.headers["x-admin-token"] !== expected) throw Object.assign(new Error("管理员凭证无效"), { status: 401 });
+}
+
 export function createApi({ store, root, uploadRoot = join(root, "data", "uploads") }) {
 
   return async function api(req, url) {
@@ -106,6 +115,35 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
 
     if (req.method === "GET" && pathname === "/api/team-config") return json(state.teamConfig ?? null);
     if (req.method === "GET" && pathname === "/api/llm/status") return json(llmStatus());
+
+    if (pathname === "/api/admin/summary" && req.method === "GET") {
+      requireAdmin(req);
+      return json({
+        teamConfig: state.teamConfig,
+        dashboard: state.dashboard,
+        counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, finalReports: Object.keys(state.finalReports ?? {}).length },
+        finalReports: Object.values(state.finalReports ?? {}),
+        tasks: state.collab.tasks ?? [],
+        recentEvidence: state.media.slice(0, 50),
+        updatedAt: state.updatedAt
+      });
+    }
+    if (pathname === "/api/admin/export" && req.method === "GET") {
+      requireAdmin(req);
+      return json(state, 200, { "content-disposition": `attachment; filename="rbcc-team8-${new Date().toISOString().slice(0, 10)}.json"` });
+    }
+    if (pathname === "/api/admin/report-upload" && req.method === "POST") {
+      requireAdmin(req);
+      const { fields, file } = await parseMultipart(req, uploadRoot);
+      if (!fields.memberId || !fields.companyId || !file) return json({ error: "缺少成员、站点或 DOCX 文件" }, 400);
+      if (file.mimeType !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document" && !file.originalName?.toLowerCase().endsWith(".docx")) return json({ error: "只允许上传 DOCX 定稿" }, 415);
+      const member = state.dashboard.members?.find(item => item.memberId === fields.memberId);
+      const site = member?.sites?.find(item => item.companyId === fields.companyId);
+      if (!member || !site) return json({ error: "成员与站点不匹配" }, 400);
+      const finalReport = record({ groupId: state.dashboard.groupId, memberId: member.memberId, memberName: member.memberName, companyId: site.companyId, companyName: site.companyName, originalName: file.originalName, storedName: file.storedName, mimeType: file.mimeType, fileSize: file.size, published: fields.published !== "false", uploadedBy: fields.uploadedBy || "管理员" }, "final-report");
+      await store.update(value => { value.finalReports ??= {}; value.finalReports[keyFor(member.memberId, site.companyId)] = finalReport; });
+      return json(finalReport, 201);
+    }
 
     if (req.method === "GET" && pathname === "/api/collab") return json(state.collab);
     if (req.method === "POST" && pathname === "/api/collab/updates") {
@@ -295,12 +333,17 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/member-long-reports" && req.method === "GET") {
       const memberId = searchParams.get("memberId");
       const value = structuredClone(state.memberLongReports[memberId] ?? { memberId, reports: [], available: false, targetChars: 10000, template: "rbcc" });
-      value.reports = (value.reports ?? []).map(report => { const generated = state.generatedReports[keyFor(memberId, report.companyId)] ?? state.researchReports[keyFor(memberId, report.companyId)]; return generated ? { ...report, available: true, charCount: JSON.stringify(generated.sections ?? {}).length } : report; });
+      value.reports = (value.reports ?? []).map(report => { const key = keyFor(memberId, report.companyId); const generated = state.generatedReports[key] ?? state.researchReports[key]; const finalReport = state.finalReports?.[key]; return generated || finalReport ? { ...report, available: true, source: finalReport ? "admin" : "generated", finalReport, charCount: generated ? JSON.stringify(generated.sections ?? {}).length : 0 } : report; });
       value.available = value.reports.some(report => report.available);
       return json(value);
     }
     if (pathname === "/api/member-long-reports/download" && req.method === "GET") {
       const memberId = searchParams.get("memberId"), companyId = searchParams.get("companyId");
+      const finalReport = state.finalReports?.[keyFor(memberId, companyId)];
+      if (finalReport?.storedName) {
+        const document = await readFile(join(uploadRoot, safeName(finalReport.storedName)));
+        return { status: 200, body: document, type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", headers: { "content-disposition": `attachment; filename*=UTF-8''${encodeURIComponent(finalReport.originalName || "RBCC-管理员定稿.docx")}` } };
+      }
       const report = baseReport(state, memberId, companyId, "iterate");
       const document = await createReportDocx(report);
       const filename = `${report.meta.memberName || "RBCC"}-${report.meta.companyName || "调研"}-调研报告.docx`;

@@ -10,6 +10,7 @@ import { NodeLibraryPage } from "./pages/NodeLibrary.jsx";
 import { AgentPage } from "./pages/KnowledgeAgent.jsx";
 import { DashboardPage } from "./pages/Dashboard.jsx";
 import { CollabHubPage } from "./pages/CollabHub.jsx";
+import { AdminPage } from "./pages/Admin.jsx";
 
 export function App() {
   const route = useRoute();
@@ -31,6 +32,7 @@ export function App() {
   else if (route.pathname === "/agent") page = <AgentPage/>;
   else if (route.pathname === "/dashboard") page = <DashboardPage search={route.search}/>;
   else if (route.pathname === "/collab") page = <CollabHubPage/>;
+  else if (route.pathname === "/admin") page = <AdminPage/>;
   else page = <div className="not-found"><strong>404</strong><p>没有找到这个调研页面。</p><a href="/">返回作战室</a></div>;
   const bare = route.pathname === "/app";
   return <Shell pathname={route.pathname} bare={bare} subtitle={route.pathname === "/" || route.pathname === "/screen" ? "全组视图 · 田野证据 → 痛点验证 → 分析对策 → 评审交付" : undefined}>{page}</Shell>;

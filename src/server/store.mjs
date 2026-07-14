@@ -48,6 +48,7 @@ export function createStore({ root, persistent = true }) {
       researchReports: reports,
       reportDrafts: {},
       generatedReports: {},
+      finalReports: {},
       memberLongReports: longReports,
       destinations,
       iterations,
@@ -117,7 +118,7 @@ function buildTeamState(config, legacyKnowledge) {
     collab: { groups: [{ id: config.group.id, name: config.group.name }], members: config.members.map(member => ({ memberId: member.id, memberName: member.name, role: member.role })), tasks, updates: [{ id: "update-team8-migration", groupId: config.group.id, memberName: config.group.name, message: "第八组新路线已更新，请各成员按 Day 1–3 分线补充预设问题与现场留痕。", status: "active", createdAt: new Date().toISOString() }] },
     problems: [], solutions: [], media: [], agentFeed: [], knowledgeDocs, researchQuestions,
     dashboard: { groupId: config.group.id, groupName: config.group.name, members, summary: { memberCount: config.members.length, uniqueSiteCount: uniqueStops.size, siteAssignmentCount: assignmentCount, sitesQuestionsComplete: 0, sitesValidatedPioneer: 0, sitesValidatedIterate: 0, sitesDualValidated: 0 }, updatedAt: new Date().toISOString() },
-    researchReports: {}, reportDrafts: {}, generatedReports: {}, memberLongReports, destinations, iterations: {}, reviewQuestions: {}
+    researchReports: {}, reportDrafts: {}, generatedReports: {}, finalReports: {}, memberLongReports, destinations, iterations: {}, reviewQuestions: {}
   };
 }
 
