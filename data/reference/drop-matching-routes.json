@@ -4,39 +4,67 @@
     "url": "https://dropaigc.com/app",
     "capturedAt": "2026-07-15",
     "policy": "external-reference-not-first-hand",
-    "notice": "以下内容仅用于设计第八组的现场追问，必须由第八组队员现场复核后才可成为证据。"
+    "notice": "Drop 站点现已下线。本库包含此前已恢复内容及基于其外部证据扩展的问题，必须由第八组队员现场复核后才可成为本组证据。"
   },
   "sites": {
     "co-zhongke": {
       "sourceSite": "中科新知（海珠）",
       "sourceProgress": "8/11",
       "questions": [
-        { "id": "drop-zk-01", "text": "除了用户不愿佩戴设备，离床、如厕和夜间谵妄分别会造成哪些监测盲区？", "dimension": "场景盲区", "target": "产品经理 / 护理人员", "method": "场景追问" },
-        { "id": "drop-zk-02", "text": "与手环等可穿戴设备相比，枕下监测在哪个真实案例中体现了不可替代性？", "dimension": "替代价值", "target": "机构信息科 / 产品经理", "method": "案例追问" },
-        { "id": "drop-zk-03", "text": "B 端机构采购与 C 端家庭付费意愿之间是否存在断裂，最终是谁为无感监测买单？", "dimension": "付费决策", "target": "采购方 / 家属", "method": "角色对比" },
-        { "id": "drop-zk-04", "text": "系统发现异常后，由谁查看、多久响应、如何通知和处置，当前链条在哪一步最容易中断？", "dimension": "响应闭环", "target": "值班人员 / 服务负责人", "method": "流程追踪" },
-        { "id": "drop-zk-05", "text": "已有连续波形后，哪些信息仍难以转成可行动告警，哪里最依赖人工解释？", "dimension": "人机协同", "target": "医护人员 / 算法工程师", "method": "告警复盘" },
-        { "id": "drop-zk-06", "text": "如果向居家长者承诺异常后 30 分钟内有人联系，谁能履约，成本和责任如何分配？", "dimension": "服务承诺", "target": "运营负责人 / 居家长者", "method": "承诺测试" }
+        { "id": "drop-zk-01", "origin": "drop-recovered", "text": "除了用户不愿佩戴设备，离床、如厕和夜间谵妄分别会造成哪些监测盲区？", "dimension": "场景盲区", "target": "产品经理 / 护理人员", "method": "场景追问" },
+        { "id": "drop-zk-02", "origin": "drop-recovered", "text": "与手环等可穿戴设备相比，枕下监测在哪个真实案例中体现了不可替代性？", "dimension": "替代价值", "target": "机构信息科 / 产品经理", "method": "案例追问" },
+        { "id": "drop-zk-03", "origin": "drop-recovered", "text": "B 端机构采购与 C 端家庭付费意愿之间是否存在断裂，最终是谁为无感监测买单？", "dimension": "付费决策", "target": "采购方 / 家属", "method": "角色对比" },
+        { "id": "drop-zk-04", "origin": "drop-recovered", "text": "系统发现异常后，由谁查看、多久响应、如何通知和处置，当前链条在哪一步最容易中断？", "dimension": "响应闭环", "target": "值班人员 / 服务负责人", "method": "流程追踪" },
+        { "id": "drop-zk-05", "origin": "drop-recovered", "text": "已有连续波形后，哪些信息仍难以转成可行动告警，哪里最依赖人工解释？", "dimension": "人机协同", "target": "医护人员 / 算法工程师", "method": "告警复盘" },
+        { "id": "drop-zk-06", "origin": "drop-recovered", "text": "如果向居家长者承诺异常后 30 分钟内有人联系，谁能履约，成本和责任如何分配？", "dimension": "服务承诺", "target": "运营负责人 / 居家长者", "method": "承诺测试" },
+        { "id": "drop-zk-07", "origin": "drop-derived", "text": "不同枕芯、床垫、睡姿和体型会如何影响波形质量，现场怎样识别设备失配而非身体异常？", "dimension": "测量边界", "target": "算法工程师 / 护理人员", "method": "边界测试" },
+        { "id": "drop-zk-08", "origin": "drop-derived", "text": "手机、手表等电子设备靠近床位时会产生哪些干扰，安装和日常使用需要什么防错机制？", "dimension": "环境干扰", "target": "实施工程师 / 用户", "method": "异常复现" },
+        { "id": "drop-zk-09", "origin": "drop-derived", "text": "误报和漏报中哪一种更不可接受，目前各自的基线、复核方法和人工兜底是什么？", "dimension": "风险权衡", "target": "医护人员 / 产品经理", "method": "基线核验" },
+        { "id": "drop-zk-10", "origin": "drop-derived", "text": "一次告警从波形异常变成医护行动，需要经过哪些阈值、解释和人工确认？", "dimension": "告警解释", "target": "算法工程师 / 值班人员", "method": "认知走查" },
+        { "id": "drop-zk-11", "origin": "drop-derived", "text": "机构信息科、护理人员、医生和家属分别能看到哪些数据，谁拥有解释权和最终处置权？", "dimension": "权责机制", "target": "多方角色", "method": "角色地图" },
+        { "id": "drop-zk-12", "origin": "drop-derived", "text": "无感监测数据用于健康管理、疾病筛查和医疗诊断时，产品边界和合规责任怎样变化？", "dimension": "合规边界", "target": "法规负责人 / 医生", "method": "边界核验" },
+        { "id": "drop-zk-13", "origin": "drop-derived", "text": "家属为什么会持续查看或停止查看监测结果，哪些信息会增加安心感，哪些反而制造焦虑？", "dimension": "家庭体验", "target": "家属 / 居家长者", "method": "行为访谈" },
+        { "id": "drop-zk-14", "origin": "drop-derived", "text": "护理人员一天会收到多少次提醒，新增告警是否减少巡查，还是形成新的注意力负担？", "dimension": "工作负担", "target": "护理人员", "method": "工作量量化" },
+        { "id": "drop-zk-15", "origin": "drop-derived", "text": "机构试点转为长期采购需要证明哪些指标：跌倒风险、夜间异常、响应时间还是人力节省？", "dimension": "采购证据", "target": "采购方 / 院方管理者", "method": "决策追问" },
+        { "id": "drop-zk-16", "origin": "drop-derived", "text": "过去部署无感监测后出现过哪些弃用、闲置或绕开系统的情况，真正原因是什么？", "dimension": "既有失败", "target": "项目负责人 / 一线人员", "method": "失败复盘" },
+        { "id": "drop-zk-17", "origin": "drop-derived", "text": "若先做两周最小试点，应选择哪类用户、记录什么基线，并保留哪些人工处置流程？", "dimension": "最小试点", "target": "项目负责人", "method": "实验设计" },
+        { "id": "drop-zk-18", "origin": "drop-derived", "text": "出现什么现场结果时，我们应承认“无感监测能带来安全感”的假设不成立？", "dimension": "反例证伪", "target": "全体相关者", "method": "证伪追问" }
       ],
       "clues": [
         { "id": "drop-zk-clue-01", "text": "参考站点曾记录演示床枕套存在长期使用痕迹，并被解释为新枕波形过于理想。", "kind": "external-observation" },
-        { "id": "drop-zk-clue-02", "text": "参考站点曾记录工程师在演示前将手机、手表放入门口铁盒。", "kind": "external-observation" }
+        { "id": "drop-zk-clue-02", "text": "参考站点曾记录工程师在演示前将手机、手表放入门口铁盒。", "kind": "external-observation" },
+        { "id": "drop-zk-clue-03", "text": "参考站点曾记录演示区的机构采购观察位使用更频繁，而家属观察位较少有人停留。", "kind": "external-observation" },
+        { "id": "drop-zk-clue-04", "text": "参考材料提到产品以二类注册和慢病管理闭环说明其机构服务定位。", "kind": "external-document-clue" }
       ]
     },
     "co-chengzhi": {
       "sourceSite": "广州成至智能机器科技",
       "sourceProgress": "8/9",
       "questions": [
-        { "id": "drop-cz-01", "text": "从发现、告警到处置和复盘，哪一环最依赖人工而不是平台自动完成？", "dimension": "处置闭环", "target": "值班员 / 指挥人员", "method": "流程追踪" },
-        { "id": "drop-cz-02", "text": "穿堂风等环境变化触发误报时，系统如何区分真实异常与假警报？", "dimension": "误报治理", "target": "一线操作员 / 算法工程师", "method": "异常复盘" },
-        { "id": "drop-cz-03", "text": "AI 算法本地更新、版本留痕和结果审计是否满足警务客户的数据与责任要求？", "dimension": "算法审计", "target": "技术负责人 / 警务客户", "method": "边界核验" },
-        { "id": "drop-cz-04", "text": "一线人员把系统视为工作支持还是额外操作压力，哪些功能真正减少了重复劳动？", "dimension": "一线体验", "target": "值班员", "method": "行为访谈" },
-        { "id": "drop-cz-05", "text": "完成处置后，平台能否自动计时、留痕并形成可复核的责任链？", "dimension": "责任追溯", "target": "指挥人员 / 管理者", "method": "记录核验" },
-        { "id": "drop-cz-06", "text": "客户愿意为少一次误报付费，还是愿意持续购买软件订阅，真实采购标准是什么？", "dimension": "订阅价值", "target": "销售 / 采购方", "method": "付费追问" }
+        { "id": "drop-cz-01", "origin": "drop-recovered", "text": "从发现、告警到处置和复盘，哪一环最依赖人工而不是平台自动完成？", "dimension": "处置闭环", "target": "值班员 / 指挥人员", "method": "流程追踪" },
+        { "id": "drop-cz-02", "origin": "drop-recovered", "text": "穿堂风等环境变化触发误报时，系统如何区分真实异常与假警报？", "dimension": "误报治理", "target": "一线操作员 / 算法工程师", "method": "异常复盘" },
+        { "id": "drop-cz-03", "origin": "drop-recovered", "text": "AI 算法本地更新、版本留痕和结果审计是否满足警务客户的数据与责任要求？", "dimension": "算法审计", "target": "技术负责人 / 警务客户", "method": "边界核验" },
+        { "id": "drop-cz-04", "origin": "drop-recovered", "text": "一线人员把系统视为工作支持还是额外操作压力，哪些功能真正减少了重复劳动？", "dimension": "一线体验", "target": "值班员", "method": "行为访谈" },
+        { "id": "drop-cz-05", "origin": "drop-recovered", "text": "完成处置后，平台能否自动计时、留痕并形成可复核的责任链？", "dimension": "责任追溯", "target": "指挥人员 / 管理者", "method": "记录核验" },
+        { "id": "drop-cz-06", "origin": "drop-recovered", "text": "客户愿意为少一次误报付费，还是愿意持续购买软件订阅，真实采购标准是什么？", "dimension": "订阅价值", "target": "销售 / 采购方", "method": "付费追问" },
+        { "id": "drop-cz-07", "origin": "drop-derived", "text": "除穿堂风外，光照、噪声、遮挡、网络波动还会造成哪些误报或漏报，现场如何快速定位？", "dimension": "环境鲁棒性", "target": "算法工程师 / 值班员", "method": "异常枚举" },
+        { "id": "drop-cz-08", "origin": "drop-derived", "text": "一次异常由谁确认、升级、派单和关闭，跨部门时最容易在哪一步失去责任人？", "dimension": "指挥权责", "target": "指挥人员 / 处置人员", "method": "责任走查" },
+        { "id": "drop-cz-09", "origin": "drop-derived", "text": "断网、断电或边缘设备离线时，系统怎样降级，值班员如何知道当前结果还能不能信？", "dimension": "故障降级", "target": "运维人员 / 值班员", "method": "故障演练" },
+        { "id": "drop-cz-10", "origin": "drop-derived", "text": "平台接入客户既有摄像头、警务系统和指挥流程时，哪类兼容问题最消耗交付人力？", "dimension": "系统兼容", "target": "交付工程师 / 客户技术人员", "method": "交付复盘" },
+        { "id": "drop-cz-11", "origin": "drop-derived", "text": "工程师手写清单中还有哪些平台未覆盖的环境检查，为什么目前仍必须依赖个人记忆？", "dimension": "隐性经验", "target": "工程师", "method": "清单走查" },
+        { "id": "drop-cz-12", "origin": "drop-derived", "text": "持续喊话、盯屏和重复确认分别造成什么身体或认知负担，能否换成更低负担的交互？", "dimension": "人因负担", "target": "操作员 / 值班员", "method": "行为观察" },
+        { "id": "drop-cz-13", "origin": "drop-derived", "text": "自动留痕至少要记录哪些时间、人员、算法版本和处置动作，才能满足事后复核？", "dimension": "审计字段", "target": "管理者 / 合规人员", "method": "记录核验" },
+        { "id": "drop-cz-14", "origin": "drop-derived", "text": "软件订阅被拒绝时，客户真正反对的是价格、持续价值、预算科目还是数据控制权？", "dimension": "采购阻力", "target": "销售 / 采购方", "method": "反对意见追问" },
+        { "id": "drop-cz-15", "origin": "drop-derived", "text": "当前一个班次会出现多少次误报，每次确认耗时多少，少一次误报能节省什么真实成本？", "dimension": "价值量化", "target": "值班队长", "method": "基线量化" },
+        { "id": "drop-cz-16", "origin": "drop-derived", "text": "设备部署后由谁校准、升级和处理模型漂移，交付结束后责任是否出现空档？", "dimension": "持续运维", "target": "客户运维 / 交付团队", "method": "生命周期追踪" },
+        { "id": "drop-cz-17", "origin": "drop-derived", "text": "若做两周最小试点，应选择哪类警情，比较哪些误报率、响应时间和人工操作指标？", "dimension": "最小试点", "target": "项目负责人 / 值班队长", "method": "实验设计" },
+        { "id": "drop-cz-18", "origin": "drop-derived", "text": "出现什么结果时，我们应承认“更少误报就能提升一线信任”的假设不成立？", "dimension": "反例证伪", "target": "一线人员 / 项目负责人", "method": "证伪追问" }
       ],
       "clues": [
         { "id": "drop-cz-clue-01", "text": "参考站点曾记录工程师工位手写清单中包含关门以避免穿堂风触发误报。", "kind": "external-observation" },
-        { "id": "drop-cz-clue-02", "text": "参考站点曾记录演示喊话后操作员表示持续喊话会造成嗓音负担。", "kind": "external-quote-summary" }
+        { "id": "drop-cz-clue-02", "text": "参考站点曾记录演示喊话后操作员表示持续喊话会造成嗓音负担。", "kind": "external-quote-summary" },
+        { "id": "drop-cz-clue-03", "text": "参考访谈中，一线值班负责人更愿意为减少误报带来的实际效果付费。", "kind": "external-interview-summary" },
+        { "id": "drop-cz-clue-04", "text": "参考材料显示销售方强调软件订阅，但现场客户对持续订阅价值仍有疑问。", "kind": "external-interview-summary" }
       ]
     }
   }

@@ -45,7 +45,7 @@ try {
   const dashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   if (dashboard.members?.length !== 1 || dashboard.members[0].sites?.length !== 10 || dashboard.summary?.siteAssignmentCount !== 48 || dashboard.summary?.uniqueSiteCount !== 22) throw new Error("dashboard member/site contract mismatch");
   const reference = await (await expectOk("/api/reference-questions?companyId=co-zhongke")).json();
-  if (!reference.matched || reference.questions?.length !== 6 || reference.clues?.length !== 2 || reference.questions.some(item => item.validationOutcome !== "pending" || !item.tags?.includes("external-reference"))) throw new Error("route reference contract mismatch");
+  if (!reference.matched || reference.questions?.length !== 18 || reference.clues?.length !== 4 || reference.questions.some(item => item.validationOutcome !== "pending" || !item.tags?.includes("external-reference") || !["drop-recovered","drop-derived"].includes(item.origin))) throw new Error("route reference contract mismatch");
   const unmatchedReference = await (await expectOk("/api/reference-questions?companyId=co-xinyuan-logistics")).json();
   if (unmatchedReference.matched || unmatchedReference.questions?.length) throw new Error("reference endpoint leaked to unmatched route");
   const beforeReferenceSave = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-zhongke")).json();
@@ -53,7 +53,7 @@ try {
   if (afterReferenceRead.questions?.length !== beforeReferenceSave.questions?.length) throw new Error("reference endpoint persisted questions without explicit save");
   await expectOk("/api/research-questions", { method:"PUT", headers:{"content-type":"application/json"}, body:JSON.stringify({ memberId:"member-jin", companyId:"co-zhongke", questions:reference.questions }) });
   const savedReference = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-zhongke")).json();
-  if (savedReference.questions?.length !== 6 || savedReference.questions.some(item => item.validationOutcome !== "pending")) throw new Error("explicit reference save did not persist as pending");
+  if (savedReference.questions?.length !== 18 || savedReference.questions.some(item => item.validationOutcome !== "pending")) throw new Error("explicit reference save did not persist as pending");
   const referenceDashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   const referenceSite = referenceDashboard.members[0].sites.find(item => item.companyId === "co-zhongke");
   if (referenceSite.questionValidationPercent !== 0 || referenceSite.evidenceCount !== 0 || referenceSite.closurePercent !== 15) throw new Error("external references affected validation or evidence progress");
