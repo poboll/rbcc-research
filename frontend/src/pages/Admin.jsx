@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Archive, Check, ChevronDown, Database, Download, FileText, FileUp, LockKeyhole, MapPin, RefreshCw, Route, Save, ShieldCheck, Trash2, Users } from "lucide-react";
+import { Archive, ArrowRight, Bot, Check, ChevronDown, CircleAlert, Database, Download, FileCheck2, FileText, FileUp, ListChecks, LockKeyhole, LogOut, MapPin, MonitorPlay, RefreshCw, Route, Save, ShieldCheck, Trash2, Users } from "lucide-react";
 import { api, downloadBlob, jsonOptions } from "../api.js";
+import { AppLink } from "../components/Shell.jsx";
 import { Empty, ErrorState, Loading, Tabs } from "../components/Ui.jsx";
 import { TEAM } from "../team.js";
 
@@ -41,13 +42,19 @@ export function AdminPage() {
       const first = data.dashboard?.members?.[0];
       setMemberId(current => data.dashboard?.members?.some(item => item.memberId === current) ? current : first?.memberId || "");
       setCompanyId(current => first?.sites?.some(item => item.companyId === current) ? current : first?.sites?.[0]?.companyId || "");
-    } catch (error) { setState({ loading: false, data: null, error: error.message }); }
+      return true;
+    } catch (error) {
+      setState({ loading: false, data: null, error: error.message });
+      return false;
+    }
   }
 
   async function login(event) {
     event.preventDefault();
-    try { await load(draftToken); sessionStorage.setItem(TOKEN_KEY, draftToken); setToken(draftToken); }
-    catch { /* load renders the error state */ }
+    const authenticated = await load(draftToken);
+    if (!authenticated) return;
+    sessionStorage.setItem(TOKEN_KEY, draftToken);
+    setToken(draftToken);
   }
 
   async function mutate(key, path, options, success) {
@@ -88,7 +95,7 @@ export function AdminPage() {
     await downloadBlob(response, "rbcc-team8-data.json");
   }
 
-  if (!token || (!state.data && !state.loading && !state.error)) return <div className="admin-login page-pad"><form onSubmit={login}><LockKeyhole size={28}/><small>RBCC 管理端</small><h1>{TEAM.name}</h1><p>输入本地管理员密码，管理路线、知识与评审定稿。</p><input type="password" required value={draftToken} onChange={event => setDraftToken(event.target.value)} placeholder="管理员密码"/><button className="primary-button">进入管理端</button></form></div>;
+  if (!token || (!state.data && !state.loading && !state.error)) return <div className="admin-login page-pad"><form onSubmit={login}><LockKeyhole size={28}/><small>RBCC 管理端</small><h1>{TEAM.name}</h1><p>输入管理员密码，统一管理路线、现场证据、知识与评审定稿。</p>{state.error ? <div className="admin-login-error" role="alert"><CircleAlert size={15}/><span>{state.error}</span></div> : null}<input type="password" required value={draftToken} onChange={event => { setDraftToken(event.target.value); if (state.error) setState(current => ({...current,error:""})); }} placeholder="管理员密码"/><button className="primary-button" disabled={state.loading}>{state.loading ? "正在验证…" : "进入管理端"}</button></form></div>;
   if (state.loading) return <Loading label="加载管理数据…"/>;
   if (state.error) return <div className="page-pad"><ErrorState message={state.error} onRetry={() => void load()}/><button onClick={() => { sessionStorage.removeItem(TOKEN_KEY); setToken(""); setState({loading:false,data:null,error:""}); }}>重新输入密码</button></div>;
 
@@ -97,15 +104,26 @@ export function AdminPage() {
   const selectedMember = data.dashboard.members.find(item => item.memberId === memberId) ?? data.dashboard.members[0];
   const sites = selectedMember?.sites ?? [];
   const selectedSite = sites.find(item => item.companyId === companyId) ?? sites[0];
+  const summary = data.dashboard.summary ?? {};
+  const membersWithEvidence = data.dashboard.members.filter(member => member.sites?.some(site => site.evidenceCount > 0)).length;
+  const taskDone = data.tasks.filter(task => task.status === "done").length;
+  const closureStages = [
+    { index:"01", label:"现场输入", detail:`${counts.evidence} 条证据 · ${membersWithEvidence}/${counts.members} 人覆盖`, value:counts.evidence, tab:"evidence" },
+    { index:"02", label:"问题验证", detail:`${summary.validatedQuestionCount||0} 条得出结论`, value:summary.validatedQuestionCount||0, tab:"overview" },
+    { index:"03", label:"痛点收敛", detail:`${counts.problems} 条问题进入判断`, value:counts.problems, tab:"evidence" },
+    { index:"04", label:"方案试验", detail:`${counts.solutions} 个关联方案`, value:counts.solutions, tab:"tasks" },
+    { index:"05", label:"评审交付", detail:`${counts.finalReports} 份 DOCX 定稿`, value:counts.finalReports, tab:"reports" }
+  ];
 
   return <div className="admin-page page-pad">
-    <header className="admin-heading"><div><ShieldCheck size={24}/><span><small>ADMIN CONTROL</small><h1>调研数据管理端</h1><p>{TEAM.name} · 修改后实时同步到队员端、协同 Hub 与评审页</p></span></div><div><button onClick={() => void exportData()}><Download size={16}/>导出数据</button><button onClick={() => void load()}><RefreshCw size={16}/>刷新</button></div></header>
+    <header className="admin-heading"><div><ShieldCheck size={24}/><span><small>闭环控制台 · 数据与交付</small><h1>调研数据管理端</h1><p>{TEAM.name} · 从现场提交到评审定稿的统一管理入口</p></span></div><div><button onClick={() => void exportData()}><Download size={16}/>导出数据</button><button onClick={() => void load()}><RefreshCw size={16}/>刷新</button><button title="退出管理端" onClick={() => { sessionStorage.removeItem(TOKEN_KEY); setToken(""); setState({loading:false,data:null,error:""}); }}><LogOut size={16}/>退出</button></div></header>
     {notice ? <div className={`admin-notice ${notice.type}`} role="status">{notice.type === "success" ? <Check size={17}/> : null}{notice.text}<button onClick={() => setNotice(null)}>×</button></div> : null}
     <section className={`admin-storage ${data.storage?.persistent?"ready":"warning"}`}><Database size={17}/><div><strong>{data.storage?.mode==="private-blob"?"生产数据：私有 Vercel Blob":"数据存储：本地 JSON"}</strong><p>{data.storage?.warning}</p></div><span>{counts.reportVersions||0} 个报告版本</span></section>
     <section className="admin-kpis">{[[Users,counts.members,"成员"],[Route,counts.assignments,"站点分配"],[Database,counts.evidence,"现场证据"],[Archive,counts.knowledge,"知识条目"],[FileUp,counts.finalReports,"管理员定稿"]].map(([Icon,value,label])=><span key={label}><Icon size={17}/><strong>{value}</strong><small>{label}</small></span>)}</section>
+    <section className="admin-story"><header><div><ListChecks size={18}/><span><h2>调研闭环推进</h2><p>数字全部来自当前生产数据，点击阶段进入对应管理模块。</p></span></div><strong>{summary.averageClosurePercent||0}% <small>平均闭环</small></strong></header><div>{closureStages.map((stage,index)=><React.Fragment key={stage.index}><button className={stage.value?"ready":"pending"} onClick={()=>setTab(stage.tab)}><span>{stage.index}</span><div><strong>{stage.label}</strong><small>{stage.detail}</small></div>{stage.value?<Check size={14}/>:<CircleAlert size={14}/>}</button>{index<closureStages.length-1?<ArrowRight size={14}/>:null}</React.Fragment>)}</div></section>
     <Tabs value={tab} onChange={setTab} items={tabItems}/>
 
-    {tab === "overview" ? <section className="admin-overview"><article><h2>数据状态</h2><dl>{[["问题库",counts.problems],["分析方案",counts.solutions],["协作任务",counts.tasks],["唯一节点",counts.uniqueSites],["知识片段",counts.knowledgeChunks],["知识来源",counts.knowledgeSources]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></article><article><h2>最近任务</h2>{data.tasks.slice(0,8).map(task=><p key={task.id}><strong>{task.title}</strong><span>{task.status}</span></p>)}</article></section> : null}
+    {tab === "overview" ? <section className="admin-overview"><article><h2>数据状态</h2><dl>{[["问题库",counts.problems],["分析方案",counts.solutions],["协作任务",counts.tasks],["唯一节点",counts.uniqueSites],["知识片段",counts.knowledgeChunks],["知识来源",counts.knowledgeSources]].map(([label,value])=><div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></article><article><h2>最近任务 · {taskDone}/{counts.tasks} 完成</h2>{data.tasks.slice(0,8).map(task=><p key={task.id}><strong>{task.title}</strong><span>{task.status}</span></p>)}</article><article className="admin-delivery"><header><Bot size={17}/><div><h2>发布前检查</h2><p>按汇报故事顺序检查现场观点、教师评审和电脑路演。</p></div></header><div><AppLink href="/collab"><Users size={15}/><span><strong>成员思考</strong><small>{data.dashboard.members.length} 人 · {counts.evidence} 条证据</small></span><ArrowRight size={14}/></AppLink><AppLink href="/review"><FileCheck2 size={15}/><span><strong>教师评审</strong><small>{counts.finalReports} 份管理员定稿</small></span><ArrowRight size={14}/></AppLink><AppLink href="/screen/roadshow"><MonitorPlay size={15}/><span><strong>全功能路演</strong><small>从田野输入讲到评审交付</small></span><ArrowRight size={14}/></AppLink></div></article></section> : null}
 
     {tab === "members" ? <section className="admin-edit-grid">{data.teamConfig.members.map(member => <article className="admin-edit-card" key={member.id}><header><Users size={18}/><div><h2>{member.name}</h2><small>{member.id}</small></div></header><TextField label="姓名" value={member.name} onChange={value => updateMember(member.id,"name",value)}/><TextField label="角色" value={member.role} onChange={value => updateMember(member.id,"role",value)}/><button className="primary-button" disabled={busy === `member-${member.id}`} onClick={() => void mutate(`member-${member.id}`,`/api/admin/members/${member.id}`,jsonOptions("PATCH",{name:member.name,role:member.role}),`已保存 ${member.name} 的资料`)}><Save size={15}/>{busy === `member-${member.id}` ? "保存中…" : "保存成员"}</button></article>)}</section> : null}
 

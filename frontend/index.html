@@ -10,7 +10,7 @@
     <title>2026 RBCC · 红鸟挑战赛企业调研</title>
     <script>
       try {
-        const theme = localStorage.getItem("rbcc-theme") || "dark";
+        const theme = localStorage.getItem("rbcc-theme") === "dark" ? "dark" : "light";
         document.documentElement.dataset.theme = theme;
         document.documentElement.style.colorScheme = theme;
       } catch {}

@@ -4,12 +4,16 @@ import { Moon, Sun } from "lucide-react";
 const STORAGE_KEY = "rbcc-theme";
 
 function initialTheme() {
-  try { return localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark"; }
-  catch { return "dark"; }
+  try { return localStorage.getItem(STORAGE_KEY) === "dark" ? "dark" : "light"; }
+  catch { return "light"; }
 }
 
+const bootTheme = initialTheme();
+document.documentElement.dataset.theme = bootTheme;
+document.documentElement.style.colorScheme = bootTheme;
+
 export function ThemeToggle() {
-  const [theme, setTheme] = useState(initialTheme);
+  const [theme, setTheme] = useState(bootTheme);
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
