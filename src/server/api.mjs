@@ -387,7 +387,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/solutions") {
       if (req.method === "GET") return json({ solutions: filterSiteItems(state.solutions, searchParams) });
       if (req.method === "POST") {
-        const item = record(await body(req), "solution");
+        const input = await body(req);
+        const item = record({ validationStatus:"draft", ...input, metrics:Array.isArray(input.metrics)?input.metrics:String(input.metrics??"").split(/[，,]/).map(value=>value.trim()).filter(Boolean) }, "solution");
         await store.update(value => value.solutions.unshift(item));
         return json(item, 201);
       }
@@ -431,14 +432,16 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       }
       if (input.action === "problem") {
         const observations=(input.observations??fallbackObservations(context)).filter(item=>item.text);
-        if(!observations.length)return json({error:"请先上传并提炼现场留痕"},422);
-        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}现场流程痛点`,evidence:observations.map(item=>item.text).join("；"),observationIds:observations.map(item=>item.sourceId).filter(Boolean),validationOutcome:"pending",severity:"normal",source:"agent"},"problem");
+        const validatedQuestions=(state.researchQuestions[keyFor(input.memberId,input.companyId)]??[]).filter(item=>item.validationOutcome&&item.validationOutcome!=="pending");
+        if(!observations.length&&!validatedQuestions.length)return json({error:"请先完成至少一条逐题验证，或上传并提炼现场留痕"},422);
+        const questionEvidence=validatedQuestions.map(item=>`[${item.validationOutcome}] ${item.text}${item.answer?`：${item.answer}`:""}${item.evidenceSource?`（${item.evidenceSource}）`:""}`);
+        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}现场流程痛点`,evidence:[...observations.map(item=>item.text),...questionEvidence].join("；"),observationIds:observations.map(item=>item.sourceId).filter(Boolean),questionIds:validatedQuestions.map(item=>item.id).filter(Boolean),validationOutcome:"pending",severity:"normal",source:"agent"},"problem");
         await store.update(value=>value.problems.unshift(item));return json(item,201);
       }
       if (input.action === "solution") {
         const confirmed=context.problems.filter(item=>item.validationOutcome==="confirmed");
         if(!confirmed.length)return json({error:"至少确认一条痛点后才能生成方案"},422);
-        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}人机协同最小试点`,description:input.description||"围绕已验证痛点建立小范围试点，保留人工最终判断权，并比较处理时长、返工率与一线采用率。",linkedProblemIds:confirmed.map(item=>item.id).slice(0,5),metrics:["处理时长","返工率","一线采用率"],source:"agent"},"solution");
+        const item=record({groupId:state.dashboard.groupId,memberId:input.memberId,memberName:input.memberName,companyId:input.companyId,companyName:input.companyName,title:input.title||`${input.companyName||"该站点"}人机协同最小试点`,description:input.description||"围绕已验证痛点建立小范围试点，保留人工最终判断权，并比较处理时长、返工率与一线采用率。",linkedProblemIds:confirmed.map(item=>item.id).slice(0,5),metrics:["处理时长","返工率","一线采用率"],testPlan:"选取一个可控场景记录基线，以人工兜底运行两周，对比试点前后指标并访谈一线使用者。",validationStatus:"draft",source:"agent"},"solution");
         await store.update(value=>value.solutions.unshift(item));return json(item,201);
       }
       if (input.action === "report") {
@@ -451,8 +454,19 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
 
     if (pathname.startsWith("/api/problems/") && req.method === "PATCH") {
       const id=pathname.split("/").pop(),patch=await body(req);let found;
+      const current=state.problems.find(item=>item.id===id);
+      if(patch.validationOutcome==="confirmed"&&!String(patch.validationNote??current?.validationNote??current?.evidence??"").trim())return json({error:"确认痛点前必须填写验证依据"},422);
       await store.update(value=>{found=value.problems.find(item=>item.id===id);if(found)Object.assign(found,{validationOutcome:patch.validationOutcome??found.validationOutcome,validationNote:patch.validationNote??found.validationNote,updatedAt:new Date().toISOString()})});
       return found?json(found):json({error:"痛点不存在"},404);
+    }
+
+    if (pathname.startsWith("/api/solutions/") && req.method === "PATCH") {
+      const id=pathname.split("/").pop(),patch=await body(req);let found;
+      const allowed=new Set(["draft","testing","validated","iterate"]);
+      if(patch.validationStatus&&!allowed.has(patch.validationStatus))return json({error:"方案验证状态无效"},400);
+      if(["validated","iterate"].includes(patch.validationStatus)&&!String(patch.validationResult??"").trim())return json({error:"结束试验前必须记录验证结果"},422);
+      await store.update(value=>{found=value.solutions.find(item=>item.id===id);if(found)Object.assign(found,{validationStatus:patch.validationStatus??found.validationStatus,validationResult:patch.validationResult??found.validationResult,testPlan:patch.testPlan??found.testPlan,metrics:patch.metrics??found.metrics,updatedAt:new Date().toISOString()})});
+      return found?json(found):json({error:"方案不存在"},404);
     }
 
     if (pathname === "/api/knowledge") {
@@ -548,6 +562,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
         const input = await body(req);
         if (!input.memberId || !input.companyId) return json({ error: "缺少 companyId 或 memberId" }, 400);
         const questions = (input.questions ?? []).map((item, index) => ({ ...item, id: item.id ?? `q-${Date.now()}-${index}`, lens: item.lens ?? "pending" }));
+        const incompleteValidation = questions.find(item => item.validationOutcome && item.validationOutcome !== "pending" && !String(item.evidenceSource ?? "").trim() && !String(item.answer ?? "").trim());
+        if (incompleteValidation) return json({ error: "填写逐题验证结论时，必须同时记录证据来源或认知变化" }, 422);
         await store.update(value => { value.researchQuestions[keyFor(input.memberId, input.companyId)] = questions; });
         return json({ questions, updatedAt: new Date().toISOString() });
       }
