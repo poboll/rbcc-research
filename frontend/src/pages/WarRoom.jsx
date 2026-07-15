@@ -35,12 +35,12 @@ export function WarRoom({ screen = false }) {
   const problemCount = state.problems?.problems?.length ?? 0;
   const solutionCount = state.solutions?.solutions?.length ?? 0;
   const linked = state.solutions?.solutions?.filter(item => item.linkedProblemIds?.length).length ?? 0;
-  const reportPercent = Math.round((summary.sitesQuestionsComplete || 0) / Math.max(1, summary.siteAssignmentCount || 47) * 100);
+  const reportPercent = Math.round((summary.reportReadyCount || 0) / Math.max(1, summary.siteAssignmentCount || 1) * 100);
   const evidenceCount=state.media?.items?.length??0;
-  const questionPercent=Math.round((summary.sitesQuestionsComplete||0)/Math.max(1,summary.siteAssignmentCount||1)*100);
+  const questionPercent=summary.questionValidationPercent||0;
   const evidencePercent=Math.min(100,Math.round(evidenceCount/Math.max(1,summary.siteAssignmentCount||1)*100));
   const solutionPercent=Math.min(100,Math.round(linked/Math.max(1,problemCount)*100));
-  const overall=Math.round(questionPercent*.35+evidencePercent*.25+solutionPercent*.2+reportPercent*.2);
+  const overall=summary.averageClosurePercent||0;
   const lanes = useMemo(() => (state.dashboard?.members ?? []).filter(member=>(view==="all"||member.memberId===memberId)).map(member=>({...member,sites:(member.sites??[]).filter(site=>day==="all"||String(site.day)===day)})), [state.dashboard,view,memberId,day]);
   if (state.loading) return <Loading label="加载作战室数据…" />;
   if (state.error) return <ErrorState message={state.error} onRetry={load} />;
@@ -54,7 +54,7 @@ export function WarRoom({ screen = false }) {
     <section className="kpi-bar">
       <small>八组 KPI</small>
       <Metric value={`${overall}%`} label="综合" tone="green" />
-      <Metric value={`${summary.sitesQuestionsComplete || 0}/${summary.siteAssignmentCount || 47}`} label="问题" tone="cyan" />
+      <Metric value={`${questionPercent}%`} label="逐题验证" tone="cyan" />
       <Metric value={`${summary.sitesDualValidated || 0}/${summary.siteAssignmentCount || 0}`} label="双线" tone="violet" />
       <Metric value={evidenceCount} label="留痕" tone="amber" />
       <Metric value={problemCount} label="问题库" />
@@ -77,10 +77,10 @@ export function WarRoom({ screen = false }) {
       <div className="lane-viewport" style={{padding:`${settings.fitPadding}px`}}><div className="lane-board" style={{transform:`scale(${zoom})`,transformOrigin:"top left",fontSize:`${settings.fontScale}%`,gap:settings.coreGap}}>
         {lanes.map(member => <article className="member-lane" key={member.memberId}>
           <div className="lane-owner"><strong>{member.memberName}</strong><small>{member.sitesComplete}/{member.totalSites} 站问题</small></div>
-          <div className="lane-sites">{member.sites?.map(site => <button key={`${site.routeId}:${site.companyId}`} className={site.questionsComplete ? "complete" : "pending"} title={site.companyName} onClick={()=>setSelectedSite({memberId:member.memberId,memberName:member.memberName,...site})}><CheckCircle2 size={11} />{site.companyName}<small>{site.evidenceCount||0}证据 · {site.problemCount||0}痛点 · {site.solutionCount||0}方案</small></button>)}</div>
+          <div className="lane-sites">{member.sites?.map(site => <button key={`${site.routeId}:${site.companyId}`} className={site.closurePercent ? "complete" : "pending"} title={site.companyName} onClick={()=>setSelectedSite({memberId:member.memberId,memberName:member.memberName,...site})}><CheckCircle2 size={11} />{site.companyName}<small>{site.questionValidationPercent||0}%验证 · {site.closurePercent||0}%闭环</small></button>)}</div>
         </article>)}
       </div></div>
-      {selectedSite?<aside className="topology-inspector"><header><div><small>{selectedSite.memberName} · Day {selectedSite.day}</small><h3>{selectedSite.companyName}</h3></div><button onClick={()=>setSelectedSite(null)}>×</button></header><div className="topology-chain"><span>预设问题<strong>{selectedSite.questions?.length||0}</strong></span><i>→</i><span>现场证据<strong>{selectedSite.evidenceCount||0}</strong></span><i>→</i><span>确认痛点<strong>{selectedSite.confirmedProblemCount||0}</strong></span><i>→</i><span>关联方案<strong>{selectedSite.solutionCount||0}</strong></span><i>→</i><span>评审报告<strong>{selectedSite.reportAvailable?"已就绪":"待生成"}</strong></span></div><div><a href={`/app?memberId=${selectedSite.memberId}`}>补充现场材料</a><a href={`/dashboard?memberId=${selectedSite.memberId}&companyId=${selectedSite.companyId}`}>打开报告工作台</a></div></aside>:null}
+      {selectedSite?<aside className="topology-inspector"><header><div><small>{selectedSite.memberName} · Day {selectedSite.day} · 闭环 {selectedSite.closurePercent||0}%</small><h3>{selectedSite.companyName}</h3></div><button onClick={()=>setSelectedSite(null)}>×</button></header><div className="topology-chain"><span>逐题验证<strong>{selectedSite.validatedQuestionCount||0}/{selectedSite.questions?.length||0}</strong></span><i>→</i><span>现场证据<strong>{selectedSite.evidenceCount||0}</strong></span><i>→</i><span>确认痛点<strong>{selectedSite.confirmedProblemCount||0}</strong></span><i>→</i><span>关联方案<strong>{selectedSite.linkedSolutionCount||0}</strong></span><i>→</i><span>试验结论<strong>{selectedSite.testedSolutionCount||0}</strong></span></div><div><a href={`/app?memberId=${selectedSite.memberId}`}>补充现场材料</a><a href={`/dashboard?memberId=${selectedSite.memberId}&companyId=${selectedSite.companyId}`}>打开报告工作台</a></div></aside>:null}
     </section>
     <footer className="statusbar">实时 · {TEAM.name} · 小组就绪 · 数据更新 {new Date(state.dashboard.updatedAt).toLocaleString("zh-CN")}</footer>
   </div>;

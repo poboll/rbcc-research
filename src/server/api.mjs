@@ -7,6 +7,8 @@ import { complete, extractJson, llmStatus } from "./llm.mjs";
 import { baseReport, generateLongReport, normalizeSections } from "./reports.mjs";
 import { keyFor } from "./store.mjs";
 
+const dropRouteReference = JSON.parse(await readFile(new URL("../../data/reference/drop-matching-routes.json", import.meta.url), "utf8"));
+
 const json = (body, status = 200, headers = {}) => ({ status, body: JSON.stringify(body), type: "application/json; charset=utf-8", headers });
 const MAX_JSON_BYTES = 2 * 1024 * 1024;
 const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
@@ -158,6 +160,27 @@ function evidenceRefs(context) {
   return [...context.media, ...context.problems, ...context.solutions].map(item => item.id).filter(Boolean);
 }
 
+const VALIDATED_OUTCOMES = new Set(["confirmed", "partial", "refuted"]);
+
+function siteProgress({ questions = [], evidenceCount = 0, confirmedProblemCount = 0, solutions = [] }) {
+  const validatedQuestionCount = questions.filter(item => VALIDATED_OUTCOMES.has(item.validationOutcome)).length;
+  const confirmedQuestionCount = questions.filter(item => item.validationOutcome === "confirmed").length;
+  const partialQuestionCount = questions.filter(item => item.validationOutcome === "partial").length;
+  const refutedQuestionCount = questions.filter(item => item.validationOutcome === "refuted").length;
+  const linkedSolutionCount = solutions.filter(item => item.linkedProblemIds?.length).length;
+  const testedSolutionCount = solutions.filter(item => ["validated", "iterate"].includes(item.validationStatus)).length;
+  const questionValidationPercent = questions.length ? Math.round(validatedQuestionCount / questions.length * 100) : 0;
+  const closurePercent = Math.round(
+    (questions.length ? 15 : 0) +
+    (questions.length ? validatedQuestionCount / questions.length * 25 : 0) +
+    (evidenceCount ? 20 : 0) +
+    (confirmedProblemCount ? 15 : 0) +
+    (linkedSolutionCount ? 15 : 0) +
+    (testedSolutionCount ? 10 : 0)
+  );
+  return { validatedQuestionCount, questionsValidatedCount:validatedQuestionCount, confirmedQuestionCount, partialQuestionCount, refutedQuestionCount, questionValidationPercent, linkedSolutionCount, testedSolutionCount, closurePercent };
+}
+
 function fallbackObservations(context) {
   return context.media.map(item => ({
     text: item.textContent || item.caption || item.title || item.fileName,
@@ -287,6 +310,11 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
 
     if (req.method === "GET" && pathname === "/api/team-config") return json(state.teamConfig ?? null);
     if (req.method === "GET" && pathname === "/api/llm/status") return json(llmStatus());
+    if (req.method === "GET" && pathname === "/api/reference-questions") {
+      const companyId = searchParams.get("companyId");
+      const site = companyId ? dropRouteReference.sites[companyId] : null;
+      return json({ source:dropRouteReference.source, companyId, matched:Boolean(site), questions:(site?.questions ?? []).map(item => ({ ...item, tags:["external-reference", "待现场复核"], validationOutcome:"pending", provenance:{ sourceUrl:dropRouteReference.source.url, sourceTeam:"team-9", sourceSite:site.sourceSite } })), clues:(site?.clues ?? []).map(item => ({ ...item, tags:["external-reference", "待现场复核"], provenance:{ sourceUrl:dropRouteReference.source.url, sourceTeam:"team-9", sourceSite:site.sourceSite } })) });
+    }
 
     if (pathname === "/api/admin/summary" && req.method === "GET") {
       requireAdmin(req);
@@ -574,11 +602,11 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       const dashboard = structuredClone(state.dashboard);
       for (const member of dashboard.members ?? []) for (const site of member.sites ?? []) {
         site.questions = state.researchQuestions[keyFor(member.memberId, site.companyId)] ?? site.questions ?? [];
-        site.questionsComplete=site.questions.length>0;site.questionsValidatedCount=site.questions.filter(item=>item.answer||item.validationOutcome==="confirmed").length;
+        site.questionsComplete=site.questions.length>0;
         site.pioneerTaggedCount=site.questions.filter(item=>item.lens==="pioneer").length;site.iterateTaggedCount=site.questions.filter(item=>item.lens==="iterate").length;
-        site.evidenceCount=state.media.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.problemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.confirmedProblemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId&&item.validationOutcome==="confirmed").length;site.solutionCount=state.solutions.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.reportAvailable=Boolean(state.generatedReports[keyFor(member.memberId,site.companyId)]||state.finalReports?.[keyFor(member.memberId,site.companyId)]);
+        site.evidenceCount=state.media.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.problemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId).length;site.confirmedProblemCount=state.problems.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId&&item.validationOutcome==="confirmed").length;const siteSolutions=state.solutions.filter(item=>item.memberId===member.memberId&&item.companyId===site.companyId);site.solutionCount=siteSolutions.length;Object.assign(site,siteProgress({questions:site.questions,evidenceCount:site.evidenceCount,confirmedProblemCount:site.confirmedProblemCount,solutions:siteSolutions}));site.reportAvailable=Boolean(state.generatedReports[keyFor(member.memberId,site.companyId)]||state.finalReports?.[keyFor(member.memberId,site.companyId)]);
       }
-      const allSites=dashboard.members?.flatMap(member=>member.sites??[])??[];dashboard.summary={...dashboard.summary,sitesQuestionsComplete:allSites.filter(site=>site.questionsComplete).length,sitesDualValidated:allSites.filter(site=>site.pioneerTaggedCount&&site.iterateTaggedCount).length,evidenceCount:state.media.length,problemCount:state.problems.length,confirmedProblemCount:state.problems.filter(item=>item.validationOutcome==="confirmed").length,solutionCount:state.solutions.length,linkedSolutionCount:state.solutions.filter(item=>item.linkedProblemIds?.length).length,reportReadyCount:Object.keys(state.generatedReports??{}).length+Object.keys(state.finalReports??{}).length};
+      const allSites=dashboard.members?.flatMap(member=>member.sites??[])??[];dashboard.summary={...dashboard.summary,sitesQuestionsComplete:allSites.filter(site=>site.questionsComplete).length,sitesDualValidated:allSites.filter(site=>site.pioneerTaggedCount&&site.iterateTaggedCount).length,validatedQuestionCount:allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0),questionCount:allSites.reduce((sum,site)=>sum+site.questions.length,0),questionValidationPercent:allSites.reduce((sum,site)=>sum+site.questions.length,0)?Math.round(allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0)/allSites.reduce((sum,site)=>sum+site.questions.length,0)*100):0,averageClosurePercent:allSites.length?Math.round(allSites.reduce((sum,site)=>sum+site.closurePercent,0)/allSites.length):0,evidenceCount:state.media.length,problemCount:state.problems.length,confirmedProblemCount:state.problems.filter(item=>item.validationOutcome==="confirmed").length,solutionCount:state.solutions.length,linkedSolutionCount:state.solutions.filter(item=>item.linkedProblemIds?.length).length,testedSolutionCount:state.solutions.filter(item=>["validated","iterate"].includes(item.validationStatus)).length,reportReadyCount:Object.keys(state.generatedReports??{}).length+Object.keys(state.finalReports??{}).length};
       if (memberId) dashboard.members = dashboard.members?.filter(item => item.memberId === memberId) ?? [];
       dashboard.updatedAt = state.updatedAt;
       return json(dashboard);

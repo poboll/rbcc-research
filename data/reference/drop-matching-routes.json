@@ -1,0 +1,43 @@
+{
+  "source": {
+    "name": "Drop 第九组路线参考",
+    "url": "https://dropaigc.com/app",
+    "capturedAt": "2026-07-15",
+    "policy": "external-reference-not-first-hand",
+    "notice": "以下内容仅用于设计第八组的现场追问，必须由第八组队员现场复核后才可成为证据。"
+  },
+  "sites": {
+    "co-zhongke": {
+      "sourceSite": "中科新知（海珠）",
+      "sourceProgress": "8/11",
+      "questions": [
+        { "id": "drop-zk-01", "text": "除了用户不愿佩戴设备，离床、如厕和夜间谵妄分别会造成哪些监测盲区？", "dimension": "场景盲区", "target": "产品经理 / 护理人员", "method": "场景追问" },
+        { "id": "drop-zk-02", "text": "与手环等可穿戴设备相比，枕下监测在哪个真实案例中体现了不可替代性？", "dimension": "替代价值", "target": "机构信息科 / 产品经理", "method": "案例追问" },
+        { "id": "drop-zk-03", "text": "B 端机构采购与 C 端家庭付费意愿之间是否存在断裂，最终是谁为无感监测买单？", "dimension": "付费决策", "target": "采购方 / 家属", "method": "角色对比" },
+        { "id": "drop-zk-04", "text": "系统发现异常后，由谁查看、多久响应、如何通知和处置，当前链条在哪一步最容易中断？", "dimension": "响应闭环", "target": "值班人员 / 服务负责人", "method": "流程追踪" },
+        { "id": "drop-zk-05", "text": "已有连续波形后，哪些信息仍难以转成可行动告警，哪里最依赖人工解释？", "dimension": "人机协同", "target": "医护人员 / 算法工程师", "method": "告警复盘" },
+        { "id": "drop-zk-06", "text": "如果向居家长者承诺异常后 30 分钟内有人联系，谁能履约，成本和责任如何分配？", "dimension": "服务承诺", "target": "运营负责人 / 居家长者", "method": "承诺测试" }
+      ],
+      "clues": [
+        { "id": "drop-zk-clue-01", "text": "参考站点曾记录演示床枕套存在长期使用痕迹，并被解释为新枕波形过于理想。", "kind": "external-observation" },
+        { "id": "drop-zk-clue-02", "text": "参考站点曾记录工程师在演示前将手机、手表放入门口铁盒。", "kind": "external-observation" }
+      ]
+    },
+    "co-chengzhi": {
+      "sourceSite": "广州成至智能机器科技",
+      "sourceProgress": "8/9",
+      "questions": [
+        { "id": "drop-cz-01", "text": "从发现、告警到处置和复盘，哪一环最依赖人工而不是平台自动完成？", "dimension": "处置闭环", "target": "值班员 / 指挥人员", "method": "流程追踪" },
+        { "id": "drop-cz-02", "text": "穿堂风等环境变化触发误报时，系统如何区分真实异常与假警报？", "dimension": "误报治理", "target": "一线操作员 / 算法工程师", "method": "异常复盘" },
+        { "id": "drop-cz-03", "text": "AI 算法本地更新、版本留痕和结果审计是否满足警务客户的数据与责任要求？", "dimension": "算法审计", "target": "技术负责人 / 警务客户", "method": "边界核验" },
+        { "id": "drop-cz-04", "text": "一线人员把系统视为工作支持还是额外操作压力，哪些功能真正减少了重复劳动？", "dimension": "一线体验", "target": "值班员", "method": "行为访谈" },
+        { "id": "drop-cz-05", "text": "完成处置后，平台能否自动计时、留痕并形成可复核的责任链？", "dimension": "责任追溯", "target": "指挥人员 / 管理者", "method": "记录核验" },
+        { "id": "drop-cz-06", "text": "客户愿意为少一次误报付费，还是愿意持续购买软件订阅，真实采购标准是什么？", "dimension": "订阅价值", "target": "销售 / 采购方", "method": "付费追问" }
+      ],
+      "clues": [
+        { "id": "drop-cz-clue-01", "text": "参考站点曾记录工程师工位手写清单中包含关门以避免穿堂风触发误报。", "kind": "external-observation" },
+        { "id": "drop-cz-clue-02", "text": "参考站点曾记录演示喊话后操作员表示持续喊话会造成嗓音负担。", "kind": "external-quote-summary" }
+      ]
+    }
+  }
+}
