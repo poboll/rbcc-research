@@ -44,6 +44,10 @@ try {
   await expectOk(`/api/knowledge/sources?id=${encodeURIComponent(mounted.source.id)}`, { method: "DELETE" });
   const dashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   if (dashboard.members?.length !== 1 || dashboard.members[0].sites?.length !== 10 || dashboard.summary?.siteAssignmentCount !== 48 || dashboard.summary?.uniqueSiteCount !== 22) throw new Error("dashboard member/site contract mismatch");
+  const generatedQuestions = Array.from({ length: 18 }, (_, index) => ({ text: `冒烟问题 ${index + 1}`, lens: "pending", tags: ["验证"] }));
+  await expectOk("/api/research-questions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ memberId: "member-jin", companyId: "co-xinyuan-logistics", questions: generatedQuestions }) });
+  const persistedQuestions = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-xinyuan-logistics")).json();
+  if (persistedQuestions.questions?.length !== 18) throw new Error("research question persistence mismatch");
   const report = await (await expectOk("/api/research-report?memberId=member-jin&companyId=co-xinyuan-logistics&groupModeId=iterate")).json();
   if (!report.sections?.situation || !report.sections?.conception) throw new Error("report block contract mismatch");
   const evidenceForm=new FormData();evidenceForm.set("groupId","team-8");evidenceForm.set("memberId","member-jin");evidenceForm.set("memberName","金俊烯");evidenceForm.set("companyId","co-xinyuan-logistics");evidenceForm.set("companyName","信源物流");evidenceForm.set("type","text");evidenceForm.set("evidenceKind","observation");evidenceForm.set("textContent","分拣异常发生后需要人工跨三个表格重复登记，现场记录一次处理约十二分钟。");

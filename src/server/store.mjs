@@ -2,7 +2,7 @@ import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { get as getBlob, put as putBlob } from "@vercel/blob";
 
-export function createStore({ root, persistent = true }) {
+export function createStore({ root, persistent = true, blobGet = getBlob, blobPut = putBlob }) {
   const dataRoot = join(root, "data");
   const deployedRoot = join(dataRoot, "deployed");
   const stateFile = join(dataRoot, "app-state.json");
@@ -60,12 +60,26 @@ export function createStore({ root, persistent = true }) {
     };
   }
 
-  async function get() {
-    if (!cached && persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
+  async function readBlobState() {
+    if (persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        const blob = await getBlob(blobStatePath, { access: "private", useCache: false });
-        if (blob) cached = JSON.parse(await new Response(blob.stream).text());
+        const blob = await blobGet(blobStatePath, { access: "private", useCache: false });
+        if (blob) return JSON.parse(await new Response(blob.stream).text());
       } catch {}
+    }
+    return null;
+  }
+
+  async function get() {
+    // Vercel may serve consecutive requests from different warm instances. Blob
+    // state must therefore be refreshed per request instead of living forever
+    // in an instance-local cache.
+    if (persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
+      const remote = await readBlobState();
+      if (remote) {
+        cached = remote;
+        return remote;
+      }
     }
     if (!cached) cached = await readJson(stateFile, null) ?? await seed();
     return cached;
@@ -74,7 +88,7 @@ export function createStore({ root, persistent = true }) {
   async function persist(value) {
     if (!persistent) return;
     if (persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN) {
-      await putBlob(blobStatePath, JSON.stringify(value), { access: "private", contentType: "application/json", addRandomSuffix: false, allowOverwrite: true });
+      await blobPut(blobStatePath, JSON.stringify(value), { access: "private", contentType: "application/json", addRandomSuffix: false, allowOverwrite: true });
       return;
     }
     const temp = `${stateFile}.${process.pid}.tmp`;
@@ -85,7 +99,12 @@ export function createStore({ root, persistent = true }) {
 
   async function update(mutator) {
     writeQueue = writeQueue.then(async () => {
-      const state = await get();
+      // Always base a Blob mutation on the latest remote document. This cannot
+      // make JSON Blob writes transactional, but it prevents stale warm
+      // instances from overwriting changes they have never observed.
+      const state = persistent === "blob" && process.env.BLOB_READ_WRITE_TOKEN
+        ? await readBlobState() ?? await get()
+        : await get();
       const result = await mutator(state);
       state.updatedAt = new Date().toISOString();
       await persist(state);
