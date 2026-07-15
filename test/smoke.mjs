@@ -48,6 +48,9 @@ try {
   await expectOk("/api/research-questions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ memberId: "member-jin", companyId: "co-xinyuan-logistics", questions: generatedQuestions }) });
   const persistedQuestions = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-xinyuan-logistics")).json();
   if (persistedQuestions.questions?.length !== 18) throw new Error("research question persistence mismatch");
+  const questionDraft = await (await expectOk("/api/research-report/suggest", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ memberId: "member-jin", companyId: "co-xinyuan-logistics" }) })).json();
+  if (questionDraft.questions?.length !== 18 || questionDraft.dimensionCount < 9) throw new Error("diverse question generation mismatch");
+  if (new Set(questionDraft.questions.map(item => item.text)).size !== 18) throw new Error("generated questions contain exact duplicates");
   const report = await (await expectOk("/api/research-report?memberId=member-jin&companyId=co-xinyuan-logistics&groupModeId=iterate")).json();
   if (!report.sections?.situation || !report.sections?.conception) throw new Error("report block contract mismatch");
   const evidenceForm=new FormData();evidenceForm.set("groupId","team-8");evidenceForm.set("memberId","member-jin");evidenceForm.set("memberName","金俊烯");evidenceForm.set("companyId","co-xinyuan-logistics");evidenceForm.set("companyName","信源物流");evidenceForm.set("type","text");evidenceForm.set("evidenceKind","observation");evidenceForm.set("textContent","分拣异常发生后需要人工跨三个表格重复登记，现场记录一次处理约十二分钟。");

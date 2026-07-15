@@ -177,9 +177,71 @@ function fallbackAgent(context, companyName) {
   return lines.join("\n\n");
 }
 
-function suggestedQuestions(companyName = "该站点") {
-  const themes = ["现有流程中最依赖个人经验的环节是什么？", "哪类异常最常发生，真实代价如何量化？", "一线人员最抗拒新增哪一步操作？", "已有系统和纸质兜底之间在哪里断裂？", "谁拥有最终判断权，错误由谁承担？", "最小可行试点应观察哪三个指标？"];
-  return themes.map((text, index) => ({ id: `suggest-${Date.now()}-${index}`, text: `${companyName}：${text}`, tags: [index < 2 ? "现状" : index < 4 ? "痛点" : "对策"], lens: "pending" }));
+const QUESTION_BLUEPRINTS = [
+  ["场景扫描", "一线执行者", "观察", "请带我走一遍最典型的工作流程，哪一步最容易停顿、绕行或返工？"],
+  ["场景扫描", "现场负责人", "追问", "今天的运行状态和高峰、异常或赶工时相比，哪些地方最不一样？"],
+  ["角色共情", "一线执行者", "访谈", "哪件看似简单的事最消耗注意力，外部人员通常看不见这种负担？"],
+  ["角色共情", "新手员工", "对比", "新手最容易误解哪条规则，熟手又依靠什么隐性经验避开错误？"],
+  ["流程断点", "上下游协作者", "追踪", "信息从谁传给谁时最容易丢失、延迟或需要重复确认？"],
+  ["流程断点", "系统使用者", "观察", "纸张、表格、聊天和业务系统之间，哪次重复录入最没有价值？"],
+  ["异常成本", "现场负责人", "关键事件", "请回忆最近一次典型异常：最早出现了什么信号，后来付出了哪些时间或资源？"],
+  ["异常成本", "受影响者", "量化", "如果这个问题一周发生多次，分别影响谁，可用什么数字记录损失？"],
+  ["权责机制", "决策者", "访谈", "信息不完整时谁做最终判断，判断错了如何发现、纠正和复盘？"],
+  ["权责机制", "一线执行者", "反事实", "如果允许你绕开一条规定完成任务，你会选哪条，为什么它阻碍了真实工作？"],
+  ["人机边界", "系统使用者", "边界测试", "哪些判断可以交给 AI 提醒或推荐，哪些必须由人确认并保留解释权？"],
+  ["人机边界", "受影响者", "风险探针", "如果 AI 在这里判断错误，谁最先受影响，哪种错误绝对不能接受？"],
+  ["人机边界", "现场负责人", "信任校准", "AI 给出建议时，现场人员需要看到哪些依据，才会采用、质疑或推翻它？"],
+  ["既有尝试", "项目负责人", "复盘", "过去为解决这个问题试过什么，为什么没有持续使用或没有达到预期？"],
+  ["既有尝试", "一线执行者", "例外", "有没有人已经用自己的小办法解决了一部分，它在什么条件下才有效？"],
+  ["反例验证", "现场负责人", "反例", "什么时候这个问题不会发生？那些成功时刻具备哪些不同条件？"],
+  ["反例验证", "受影响者", "证伪", "什么现场证据会证明我们对问题的理解是错的，而不是继续支持原假设？"],
+  ["机会方向", "一线执行者", "共创", "如果只能减少一个步骤、一次等待或一种重复劳动，你最希望先改哪一个？"],
+  ["机会方向", "决策者", "优先级", "在影响范围、发生频率和改造难度之间，你会怎样排序当前问题？"],
+  ["试点验证", "项目负责人", "实验", "两周内能做的最小试点是什么，必须保留哪些人工兜底？"],
+  ["试点验证", "受影响者", "指标", "试点成功除了更快，还应改善准确性、体验或信任中的哪一项？"],
+  ["未来想象", "一线执行者", "未来回望", "假设一年后工作明显变好，你每天最先感受到的变化会是什么？"],
+  ["未来想象", "决策者", "约束", "若预算、数据权限或组织协同受限，哪个条件最可能让方案无法落地？"],
+  ["关系生态", "外部协作者", "生态图", "这个现场之外还有谁影响结果，却从未进入现有讨论或数据记录？"],
+  ["价值冲突", "多方角色", "权衡", "效率、质量、安全与人的感受发生冲突时，目前实际优先保护哪一个？"]
+];
+
+function normalizedQuestionText(text = "") {
+  return String(text).toLowerCase().replace(/[\s，。！？、：；,.!?:;（）()“”"'《》【】\-]/g, "");
+}
+
+function questionSimilarity(left, right) {
+  const a = normalizedQuestionText(left), b = normalizedQuestionText(right);
+  if (!a || !b) return 0;
+  if (a.includes(b) || b.includes(a)) return Math.min(a.length, b.length) / Math.max(a.length, b.length);
+  const grams = value => new Set(Array.from({ length: Math.max(0, value.length - 1) }, (_, index) => value.slice(index, index + 2)));
+  const ag = grams(a), bg = grams(b);
+  const common = [...ag].filter(value => bg.has(value)).length;
+  return common / Math.max(1, ag.size + bg.size - common);
+}
+
+function diverseQuestions(companyName = "该站点", candidates = [], existing = []) {
+  const fallback = QUESTION_BLUEPRINTS.map(([dimension, target, method, text], index) => ({ id: `suggest-${Date.now()}-${index}`, text: `${companyName}：${text}`, dimension, target, method, tags: [dimension, method], lens: "pending" }));
+  const prepared = [...candidates, ...fallback].map((item, index) => ({ ...item, id: item.id ?? `suggest-${Date.now()}-${index}`, text: String(item.text ?? "").trim(), dimension: item.dimension ?? item.tags?.[0] ?? "现场探索", target: item.target ?? "现场相关者", method: item.method ?? "访谈", tags: [...new Set([...(item.tags ?? []), item.dimension, item.method].filter(Boolean))].slice(0, 4), lens: item.lens ?? "pending" })).filter(item => item.text.length >= 12);
+  const selected = [];
+  const dimensionCounts = new Map();
+  const dimensionLimit = dimension => dimension === "人机边界" ? 3 : 2;
+  for (const item of prepared) {
+    if (existing.some(saved => questionSimilarity(item.text, saved.text) >= .62)) continue;
+    if (selected.some(saved => questionSimilarity(item.text, saved.text) >= .62)) continue;
+    if ((dimensionCounts.get(item.dimension) ?? 0) >= dimensionLimit(item.dimension)) continue;
+    selected.push(item);
+    dimensionCounts.set(item.dimension, (dimensionCounts.get(item.dimension) ?? 0) + 1);
+    if (selected.length === 18) break;
+  }
+  if (selected.length < 18) for (const item of fallback) {
+    if ((dimensionCounts.get(item.dimension) ?? 0) >= dimensionLimit(item.dimension)) continue;
+    if (!selected.some(saved => questionSimilarity(item.text, saved.text) >= .62)) {
+      selected.push(item);
+      dimensionCounts.set(item.dimension, (dimensionCounts.get(item.dimension) ?? 0) + 1);
+    }
+    if (selected.length === 18) break;
+  }
+  return selected;
 }
 
 function requireAdmin(req) {
@@ -537,15 +599,18 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
         return json({ added: additions.length, questions: [...existing, ...additions] });
       }
       const site = state.dashboard.members?.flatMap(member => member.sites ?? []).find(item => item.companyId === input.companyId);
-      let questions = suggestedQuestions(site?.companyName).flatMap((item, index) => [item, { ...item, id: `${item.id}-b`, text: `${item.text.replace(/[？?]$/, "")}的可观察证据是什么？`, tags: [index < 2 ? "证据" : "验证"] }, { ...item, id: `${item.id}-c`, text: `${item.text.replace(/[？?]$/, "")}若不解决会造成什么后果？`, tags: ["影响"] }]).slice(0, 18);
+      const existingQuestions = state.researchQuestions[key] ?? [];
+      let questions = diverseQuestions(site?.companyName, [], existingQuestions);
       let project = { title: `${site?.companyName ?? "站点"}证据闭环试点`, summary: "选择一个高频、高代价且可观察的痛点，以两周为周期记录基线、试点过程和结果，保留人工最终判断权。", linkedProblemIds: state.problems.filter(item => item.companyId === input.companyId).slice(0, 3).map(item => item.id), metrics: ["处理时长", "误报/返工率", "一线采用率"] };
       let mode = "knowledge";
       try {
-        const response = await complete([{ role: "system", content: "根据调研材料输出 JSON：questions 为 18 个含 text,tags 的可验证问题；project 含 title,summary,linkedProblemIds,metrics。不得编造事实。" }, { role: "user", content: JSON.stringify(evidenceContext(state, input.memberId, input.companyId)).slice(0, 50_000) }], { maxTokens: 2600 });
+        const response = await complete([{ role: "system", content: `你是资深设计研究员，为企业现场走访设计 18 个高信息增益问题。输出严格 JSON：questions 数组每项含 text、dimension、target、method、tags；project 含 title、summary、linkedProblemIds、metrics。
+要求：覆盖场景扫描、角色共情、流程断点、异常成本、权责机制、人机边界、既有尝试、反例验证、机会方向、试点验证中的至少 9 类；混合观察、关键事件访谈、追问、量化、反事实、证伪和共创，不得只是改写同一个母题；每题只问一件事，并指向明确角色或可观察现场；至少 3 题寻找反例或证伪，至少 3 题讨论 AI 的授权、解释权、人工兜底与风险；避开已有问题，不预设企业事实，不编造数字、访谈或结论。` }, { role: "user", content: JSON.stringify({ site: { companyName: site?.companyName, themeName: site?.themeName, activity: site?.activity }, existingQuestions, evidence: evidenceContext(state, input.memberId, input.companyId) }).slice(0, 50_000) }], { maxTokens: 3600 });
         const parsed = extractJson(response);
-        if (parsed?.questions?.length) { questions = parsed.questions; project = parsed.project ?? project; mode = "llm"; }
+        if (parsed?.questions?.length) { questions = diverseQuestions(site?.companyName, parsed.questions, existingQuestions); project = parsed.project ?? project; mode = "llm"; }
       } catch {}
-      return json({ questions, questionCount: questions.length, project, mode });
+      const dimensions = [...new Set(questions.map(item => item.dimension).filter(Boolean))];
+      return json({ questions, questionCount: questions.length, dimensions, dimensionCount: dimensions.length, avoidedExistingCount: existingQuestions.length, project, mode });
     }
     if (pathname === "/api/research-report" && req.method === "POST") {
       const input = await body(req);
