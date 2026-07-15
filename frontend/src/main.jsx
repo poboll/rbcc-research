@@ -8,6 +8,7 @@ import "./local-polish.css";
 import "./local-overrides.css";
 import "./compact-density.css";
 import "./collab-readable.css";
+import "./traces-readable.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
