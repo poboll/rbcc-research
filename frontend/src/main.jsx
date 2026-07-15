@@ -16,6 +16,7 @@ import "./theme.css";
 import "./knowledge-polish.css";
 import "./field-polish.css";
 import "./admin-polish.css";
+import "./light-polish.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

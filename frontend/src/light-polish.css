@@ -1,0 +1,78 @@
+/* Final light-theme interaction layer. Keep this last so legacy dark defaults cannot leak through. */
+html[data-theme="light"] :is(button,a,input,textarea,select):focus-visible{
+  outline:2px solid rgba(0,112,243,.42);
+  outline-offset:2px;
+}
+html[data-theme="light"] button:disabled{
+  cursor:not-allowed;
+  opacity:.55;
+}
+html[data-theme="light"] :is(.primary-button,.knowledge-search button,.agent-chat>form button):hover:not(:disabled){
+  border-color:#0063d9;
+  background:#0063d9;
+  color:#fff;
+}
+
+html[data-theme="light"] .milestone-hub{
+  color:#171717;
+}
+html[data-theme="light"] .milestone-hub .perspective-card{
+  border-color:#e5e5e5!important;
+  background:#fff!important;
+  color:#171717;
+  box-shadow:none!important;
+}
+html[data-theme="light"] .milestone-hub .perspective-card:hover{
+  border-color:#93c5fd!important;
+  background:#f8fbff!important;
+}
+html[data-theme="light"] .milestone-hub .perspective-card.selected{
+  border-color:#60a5fa!important;
+  background:#eef6ff!important;
+  color:#172554;
+  box-shadow:inset 0 0 0 1px #bfdbfe!important;
+}
+html[data-theme="light"] .milestone-hub .perspective-card :is(p,strong){
+  color:inherit;
+}
+html[data-theme="light"] .milestone-hub .perspective-card :is(small,footer){
+  color:#737373;
+}
+html[data-theme="light"] .milestone-hub .perspective-card.selected :is(small,footer){
+  color:#526273;
+}
+html[data-theme="light"] .milestone-hub .perspective-card::after{
+  color:#0068d7;
+}
+html[data-theme="light"] .milestone-hub .milestone-actions>a{
+  border-color:#e5e5e5;
+  background:#fff;
+  color:#404040;
+}
+html[data-theme="light"] .milestone-hub .milestone-actions>a:hover{
+  border-color:#93c5fd;
+  background:#eef6ff;
+  color:#075985;
+}
+html[data-theme="light"] .milestone-hub :is(.tabs button,.all-tasks article>button){
+  box-shadow:none;
+}
+html[data-theme="light"] .milestone-hub .tabs button:hover:not(.active){
+  border-color:#a3a3a3;
+  background:#fafafa;
+  color:#171717;
+}
+html[data-theme="light"] .milestone-hub .all-tasks article>button:hover{
+  border-color:#86c8aa;
+  background:#f0fdf4;
+  color:#166534;
+}
+
+html[data-theme="light"] .scene-rail button.active{
+  border-color:#93c5fd!important;
+  background:#eef6ff!important;
+  color:#075985!important;
+}
+html[data-theme="light"] .scene-rail button.active em{
+  color:#526273;
+}
