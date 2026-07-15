@@ -1,0 +1,294 @@
+/* Milestone board readability layer. Scoped to /collab to avoid changing field capture density. */
+.milestone-hub {
+  --collab-body: 13px;
+  --collab-meta: 11px;
+  --collab-label: 12px;
+  gap: 20px;
+  max-width: 1480px;
+  color: #dbe5ec;
+}
+
+.milestone-hub .collab-hero {
+  padding-bottom: 22px;
+}
+
+.milestone-hub .collab-hero small {
+  font-size: 13px !important;
+  line-height: 1.45;
+}
+
+.milestone-hub .collab-hero h1 {
+  margin: 5px 0 6px;
+  font-size: 30px;
+  line-height: 1.25;
+}
+
+.milestone-hub .collab-hero p {
+  max-width: 720px;
+  color: #a4b0ba;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.milestone-hub .collab-hero a,
+.milestone-hub .collab-hero button {
+  min-height: 38px;
+  padding: 0 12px;
+  font-size: 12px !important;
+}
+
+.milestone-hub .milestone-overview {
+  grid-template-columns: 280px minmax(470px, 1fr) minmax(160px, auto);
+}
+
+.milestone-hub .milestone-score {
+  gap: 10px;
+  padding: 22px;
+}
+
+.milestone-hub .milestone-score > span small,
+.milestone-hub .milestone-flow small {
+  font-size: var(--collab-label) !important;
+}
+
+.milestone-hub .milestone-score > p {
+  color: #8fa0ad;
+  font-size: var(--collab-label) !important;
+  line-height: 1.65;
+}
+
+.milestone-hub .milestone-flow {
+  gap: 12px;
+  padding: 18px;
+}
+
+.milestone-hub .milestone-flow > span {
+  min-width: 92px;
+  padding: 9px 11px;
+}
+
+.milestone-hub .milestone-flow strong {
+  font-size: 14px;
+}
+
+.milestone-hub .milestone-flow em {
+  font-size: 15px;
+}
+
+.milestone-hub .milestone-actions > a {
+  min-height: 42px;
+  font-size: 12px;
+}
+
+.milestone-hub .thinking-section,
+.milestone-hub .member-deep-dive,
+.milestone-hub .thought-stream,
+.milestone-hub .route-milestones {
+  padding-top: 20px;
+}
+
+.milestone-hub .thinking-section h2,
+.milestone-hub .synthesis-board h2,
+.milestone-hub .member-deep-dive h2,
+.milestone-hub .thought-stream h2,
+.milestone-hub .route-milestones h2,
+.milestone-hub .collab-operations h2 {
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.milestone-hub .thinking-section header p,
+.milestone-hub .synthesis-board header p,
+.milestone-hub .member-deep-dive header p,
+.milestone-hub .thought-stream header p,
+.milestone-hub .route-milestones header p,
+.milestone-hub .collab-operations header p {
+  color: #8fa0ad;
+  font-size: var(--collab-label) !important;
+  line-height: 1.55;
+}
+
+.milestone-hub .thinking-section > header > strong {
+  font-size: 12px;
+}
+
+.milestone-hub .perspective-grid {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.milestone-hub .perspective-card {
+  gap: 12px;
+  min-height: 320px;
+  padding: 14px;
+}
+
+.milestone-hub .perspective-card > header strong {
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.milestone-hub .perspective-card > header small,
+.milestone-hub .perspective-card small {
+  color: #8fa0ad;
+  font-size: var(--collab-meta) !important;
+  line-height: 1.45;
+}
+
+.milestone-hub .perspective-card p {
+  color: #c5d0d8;
+  font-size: var(--collab-body) !important;
+  line-height: 1.65;
+}
+
+.milestone-hub .perspective-focus {
+  min-height: 88px;
+}
+
+.milestone-hub .perspective-insight,
+.milestone-hub .perspective-open {
+  min-height: 74px;
+  padding-top: 10px;
+}
+
+.milestone-hub .perspective-card > footer {
+  gap: 10px;
+  padding-top: 10px;
+  font-size: var(--collab-meta);
+}
+
+.milestone-hub .synthesis-board {
+  gap: 14px;
+}
+
+.milestone-hub .synthesis-board > article,
+.milestone-hub .member-deep-grid > article,
+.milestone-hub .collab-operations > article {
+  padding: 17px;
+}
+
+.milestone-hub .open-column li p,
+.milestone-hub .consensus-column blockquote p {
+  font-size: var(--collab-body) !important;
+  line-height: 1.65;
+}
+
+.milestone-hub .open-column li small,
+.milestone-hub .consensus-column blockquote footer,
+.milestone-hub .milestone-empty p,
+.milestone-hub .milestone-empty a {
+  font-size: var(--collab-meta) !important;
+  line-height: 1.55;
+}
+
+.milestone-hub .milestone-empty strong {
+  font-size: 14px;
+}
+
+.milestone-hub .member-deep-grid h3 {
+  font-size: 15px;
+}
+
+.milestone-hub .question-list p,
+.milestone-hub .problem-item strong,
+.milestone-hub .solution-item strong {
+  font-size: var(--collab-body) !important;
+  line-height: 1.55;
+}
+
+.milestone-hub .question-list p small,
+.milestone-hub .problem-item p,
+.milestone-hub .solution-item p,
+.milestone-hub .problem-item small,
+.milestone-hub .solution-item small,
+.milestone-hub .member-deep-grid .question-list em,
+.milestone-hub .compact-empty {
+  font-size: var(--collab-meta) !important;
+  line-height: 1.55;
+}
+
+.milestone-hub .thought-stream article p,
+.milestone-hub .mini-feed p {
+  font-size: var(--collab-body) !important;
+  line-height: 1.65;
+}
+
+.milestone-hub .thought-stream article header small,
+.milestone-hub .thought-stream article time {
+  font-size: var(--collab-meta) !important;
+}
+
+.milestone-hub .route-milestones > div {
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.milestone-hub .route-milestones article {
+  min-height: 128px;
+  padding: 13px;
+}
+
+.milestone-hub .route-milestones article header strong,
+.milestone-hub .all-tasks article strong,
+.milestone-hub .mini-traces strong {
+  font-size: var(--collab-body);
+  line-height: 1.45;
+}
+
+.milestone-hub .route-milestones article p,
+.milestone-hub .all-tasks article p {
+  color: #b6c2cb;
+  font-size: var(--collab-label) !important;
+  line-height: 1.55;
+}
+
+.milestone-hub .route-milestones article small,
+.milestone-hub .all-tasks article small,
+.milestone-hub .mini-traces small,
+.milestone-hub .collab-operations header a,
+.milestone-hub .route-milestones > header > a {
+  font-size: var(--collab-meta) !important;
+  line-height: 1.5;
+}
+
+.milestone-hub .all-tasks article {
+  min-height: 112px;
+  padding: 12px;
+}
+
+.milestone-hub .tabs button {
+  min-height: 34px;
+  font-size: 12px !important;
+}
+
+@media (max-width: 1100px) {
+  .milestone-hub .milestone-overview {
+    grid-template-columns: 240px 1fr;
+  }
+
+  .milestone-hub .perspective-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .milestone-hub {
+    --collab-body: 14px;
+    --collab-meta: 12px;
+    --collab-label: 13px;
+    gap: 16px;
+  }
+
+  .milestone-hub .collab-hero h1 {
+    font-size: 25px;
+  }
+
+  .milestone-hub .perspective-grid,
+  .milestone-hub .milestone-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .milestone-hub .perspective-card {
+    min-height: 0;
+  }
+}

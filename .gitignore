@@ -6,6 +6,7 @@ data/uploads/
 data/generated/
 data/app-state.json
 data/archive/
+data/backups/
 .vercel/
 .DS_Store
 npm-debug.log*
