@@ -98,10 +98,15 @@ function chunkDocument(text, size = 1200, overlap = 180) {
 function searchKnowledge(state, query, limit = 20) {
   const terms = String(query ?? "").toLowerCase().split(/[\s，、,。；;：:]+/).filter(term => term.length > 1);
   if (!terms.length) return [];
-  return (state.knowledgeChunks ?? []).map(chunk => {
-    const haystack = `${chunk.title ?? ""} ${chunk.content}`.toLowerCase();
+  const indexedSourceIds = new Set((state.knowledgeChunks ?? []).map(chunk => chunk.sourceId).filter(Boolean));
+  const entries = [
+    ...(state.knowledgeChunks ?? []).map(chunk => ({ ...chunk, sourceKind:"mounted" })),
+    ...state.knowledgeDocs.filter(doc => !doc.sourceId || !indexedSourceIds.has(doc.sourceId)).map(doc => ({ ...doc, position:0, sourceKind:"custom" }))
+  ];
+  return entries.map(entry => {
+    const haystack = `${entry.title ?? ""} ${entry.content ?? ""} ${(entry.tags ?? []).join(" ")}`.toLowerCase();
     const score = terms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 + haystack.split(term).length - 2 : 0), 0);
-    return { ...chunk, score };
+    return { ...entry, score };
   }).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.position - b.position).slice(0, limit);
 }
 

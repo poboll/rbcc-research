@@ -32,7 +32,7 @@ export function App() {
   else if (route.pathname === "/app") page = <FieldApp search={route.search}/>;
   else if (route.pathname === "/library") page = <NodeLibraryPage/>;
   else if (route.pathname === "/traces") page = <TracesPage/>;
-  else if (route.pathname === "/agent") page = <AgentPage/>;
+  else if (route.pathname === "/agent") page = <AgentPage search={route.search}/>;
   else if (route.pathname === "/dashboard") page = <DashboardPage search={route.search}/>;
   else if (route.pathname === "/collab") page = <CollabHubPage/>;
   else if (route.pathname === "/admin") page = <AdminPage/>;

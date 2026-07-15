@@ -42,6 +42,8 @@ try {
   const search = await (await expectOk(`/api/knowledge/search?q=${encodeURIComponent("生产线 流程异常")}`)).json();
   if (!search.results?.some(item => item.sourceId === mounted.source.id)) throw new Error("knowledge search contract mismatch");
   await expectOk(`/api/knowledge/sources?id=${encodeURIComponent(mounted.source.id)}`, { method: "DELETE" });
+  const customSearch = await (await expectOk(`/api/knowledge/search?q=${encodeURIComponent("信源物流")}`)).json();
+  if (!customSearch.results?.some(item => item.id === "site-co-xinyuan-logistics" && item.sourceKind === "custom")) throw new Error("custom knowledge search contract mismatch");
   const dashboard = await (await expectOk("/api/research-dashboard?memberId=member-jin")).json();
   if (dashboard.members?.length !== 1 || dashboard.members[0].sites?.length !== 10 || dashboard.summary?.siteAssignmentCount !== 48 || dashboard.summary?.uniqueSiteCount !== 22) throw new Error("dashboard member/site contract mismatch");
   const reference = await (await expectOk("/api/reference-questions?companyId=co-zhongke")).json();

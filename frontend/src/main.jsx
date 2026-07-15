@@ -13,6 +13,7 @@ import "./agent-polish.css";
 import "./review-polish.css";
 import "./system-polish.css";
 import "./theme.css";
+import "./knowledge-polish.css";
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
