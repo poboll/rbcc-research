@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Shell } from "./components/Shell.jsx";
 import { useRoute } from "./hooks.js";
 import { WarRoom } from "./pages/WarRoom.jsx";
@@ -17,14 +17,8 @@ import { ThemeToggle } from "./components/ThemeToggle.jsx";
 
 export function App() {
   const route = useRoute();
-  useEffect(() => {
-    if (route.pathname === "/" && window.matchMedia("(max-width: 600px)").matches) {
-      history.replaceState(null, "", "/app");
-      window.dispatchEvent(new Event("rbcc:navigate"));
-    }
-  }, [route.pathname]);
   let page;
-  if (route.pathname === "/screen" || route.pathname === "/") page = <WarRoom screen={route.pathname === "/screen"}/>;
+  if (route.pathname === "/screen" || route.pathname === "/") page = <WarRoom screen={route.pathname === "/screen"} search={route.search}/>;
   else if (route.pathname === "/screen/roadshow") page = <Roadshow/>;
   else if (route.pathname === "/design") page = <DesignMode/>;
   else if (route.pathname === "/review") page = <ReviewHome/>;

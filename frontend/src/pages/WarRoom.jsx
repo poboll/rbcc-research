@@ -10,11 +10,12 @@ function Metric({ value, label, tone }) {
   return <span className={`metric ${tone || ""}`}><strong>{value}</strong><small>{label}</small></span>;
 }
 
-export function WarRoom({ screen = false }) {
+export function WarRoom({ screen = false, search = "" }) {
+  const initialMemberId = new URLSearchParams(search).get("memberId") || "";
   const [state, setState] = useState({ loading: true, error: null, dashboard: null, media: null, problems: null, solutions: null });
-  const [view,setView]=useState("all");
+  const [view,setView]=useState(initialMemberId ? "member" : "all");
   const [day,setDay]=useState("all");
-  const [memberId,setMemberId]=useState("");
+  const [memberId,setMemberId]=useState(initialMemberId);
   const [zoom,setZoom]=useState(1);
   const [demo,setDemo]=useState(false);
   const [settings,setSettings]=useState(loadPresentationSettings);
@@ -29,6 +30,14 @@ export function WarRoom({ screen = false }) {
     } catch (error) { setState(current => ({ ...current, loading: false, error: error.message })); }
   };
   useEffect(() => { void load(); }, []);
+  useEffect(() => {
+    const refresh = event => { if (event.type === "rbcc:research-updated" || event.key === "rbcc-research-updated") void load(); };
+    const visible = () => { if (document.visibilityState === "visible") void load(); };
+    window.addEventListener("rbcc:research-updated", refresh);
+    window.addEventListener("storage", refresh);
+    document.addEventListener("visibilitychange", visible);
+    return () => { window.removeEventListener("rbcc:research-updated", refresh); window.removeEventListener("storage", refresh); document.removeEventListener("visibilitychange", visible); };
+  }, []);
   useEffect(()=>{const listener=event=>setSettings(event.detail);window.addEventListener("rbcc:presentation-settings",listener);return()=>window.removeEventListener("rbcc:presentation-settings",listener)},[]);
   useEffect(()=>{if(!demo)return;const timer=setInterval(()=>setDay(value=>value==="all"?"1":value==="1"?"2":value==="2"?"3":"all"),3200);return()=>clearInterval(timer)},[demo]);
   const summary = state.dashboard?.summary ?? {};
