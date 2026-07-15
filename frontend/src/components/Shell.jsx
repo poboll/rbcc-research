@@ -20,7 +20,8 @@ export { AppLink };
 export function Shell({ pathname, children, subtitle, bare = false }) {
   if (bare) return children;
   const usesScreenNav = pathname === "/" || pathname.startsWith("/screen") || pathname === "/design";
-  return <div className="app-shell">
+  const shellClass = pathname.startsWith("/review") ? "app-shell review-shell" : "app-shell";
+  return <div className={shellClass}>
     {usesScreenNav ? <header className="topbar">
       <AppLink href="/screen" className="brand">
         <span className="brand-icon"><Monitor size={17} /></span>
