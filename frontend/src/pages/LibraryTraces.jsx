@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Archive, BookOpen, Camera, ExternalLink, FileText, Maximize2, Mic, Plus, Search, Trash2, X } from "lucide-react";
+import { Archive, BookOpen, Camera, ExternalLink, FileText, Maximize2, Minimize2, Mic, Plus, Search, Trash2, X } from "lucide-react";
 import { json, jsonOptions } from "../api.js";
 import { Empty, ErrorState, Loading, Tabs } from "../components/Ui.jsx";
 import { useAsyncJson } from "../hooks.js";
@@ -21,6 +21,7 @@ export function LibraryPage() {
 export function TracesPage() {
   const [type, setType] = useState("all");
   const [preview, setPreview] = useState(null);
+  const [previewMode, setPreviewMode] = useState("width");
   const { data, loading, error, reload } = useAsyncJson(`/api/media?groupId=${TEAM.id}${type === "all" ? "" : `&type=${type}`}`, [type]);
   const items = data?.items ?? [];
   useEffect(() => {
@@ -33,7 +34,20 @@ export function TracesPage() {
   }, [preview]);
   if (loading) return <Loading label="加载留痕库…" />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
-  return <div className="traces-page page-pad"><header className="page-heading"><div><Archive size={20}/><span><small>留痕库</small><h1>现场证据与过程记录</h1><p>按成员与站点保存图片、录音和文字，点击图片可查看原始证据。</p></span></div><strong>{items.length} 条</strong></header><Tabs value={type} onChange={setType} items={[{value:"all",label:"全部"},{value:"image",label:"图片",icon:<Camera size={13}/>},{value:"audio",label:"录音",icon:<Mic size={13}/>},{value:"text",label:"文字",icon:<FileText size={13}/>}]} /><section className="trace-grid">{items.slice(0,160).map(item => <article className={`trace-card ${item.type}`} key={item.id}>{item.type==="image"&&item.url?<button className="trace-media-button" type="button" onClick={()=>setPreview(item)} aria-label={`预览图片：${item.caption||item.title||item.fileName||"现场图片"}`}><img className="trace-preview" src={item.url} alt={item.caption||item.title||"现场图片"} loading="lazy"/><span><Maximize2 size={16}/>查看原图</span></button>:item.type==="audio"&&item.url?<div className="trace-audio-wrap"><span><Mic size={20}/></span><audio className="trace-audio" src={item.url} controls preload="metadata"/></div>:<div className={`trace-kind ${item.type}`}>{item.type === "image" ? <Camera/> : item.type === "audio" ? <Mic/> : <FileText/>}</div>}<div className="trace-card-body"><small>{item.memberName || "未标记成员"} · {item.companyName || "未标记站点"}</small><h2>{item.title || "现场留痕"}</h2><p>{item.textContent || item.caption || readableFileName(item.fileName) || "已上传现场素材"}</p><time>{item.createdAt ? new Date(item.createdAt).toLocaleString("zh-CN") : ""}</time></div></article>)}</section>{!items.length ? <Empty /> : null}{preview?<div className="trace-lightbox" role="dialog" aria-modal="true" aria-label="现场图片预览" onMouseDown={event=>{if(event.target===event.currentTarget)setPreview(null)}}><div className="trace-lightbox-panel"><header><div><small>{preview.memberName || "未标记成员"} · {preview.companyName || "未标记站点"}</small><strong>{preview.title || "现场留痕"}</strong></div><button type="button" onClick={()=>setPreview(null)} title="关闭预览" aria-label="关闭预览"><X size={20}/></button></header><div className="trace-lightbox-image"><img src={preview.url} alt={preview.caption||preview.title||"现场图片原图"}/></div><footer><div><p>{preview.textContent || preview.caption || readableFileName(preview.fileName) || "该图片暂无文字说明"}</p><time>{preview.createdAt ? new Date(preview.createdAt).toLocaleString("zh-CN") : ""}</time></div><a href={preview.url} target="_blank" rel="noreferrer">新窗口打开<ExternalLink size={15}/></a></footer></div></div>:null}</div>;
+  return <div className="traces-page page-pad">
+    <header className="page-heading"><div><Archive size={20}/><span><small>留痕库</small><h1>现场证据与过程记录</h1><p>按成员与站点保存图片、录音和文字，点击图片可查看原始证据。</p></span></div><strong>{items.length} 条</strong></header>
+    <Tabs value={type} onChange={setType} items={[{value:"all",label:"全部"},{value:"image",label:"图片",icon:<Camera size={13}/>},{value:"audio",label:"录音",icon:<Mic size={13}/>},{value:"text",label:"文字",icon:<FileText size={13}/>}]}/>
+    <section className="trace-grid">{items.slice(0,160).map(item => <article className={`trace-card ${item.type}`} key={item.id}>
+      {item.type==="image"&&item.url?<button className="trace-media-button" type="button" onClick={()=>{setPreviewMode("width");setPreview(item)}} aria-label={`预览图片：${item.caption||item.title||item.fileName||"现场图片"}`}><img className="trace-preview" src={item.url} alt={item.caption||item.title||"现场图片"} loading="lazy"/><span><Maximize2 size={16}/>查看原图</span></button>:item.type==="audio"&&item.url?<div className="trace-audio-wrap"><span><Mic size={20}/></span><audio className="trace-audio" src={item.url} controls preload="metadata"/></div>:<div className={`trace-kind ${item.type}`}>{item.type === "image" ? <Camera/> : item.type === "audio" ? <Mic/> : <FileText/>}</div>}
+      <div className="trace-card-body"><small>{item.memberName || "未标记成员"} · {item.companyName || "未标记站点"}</small><h2>{item.title || "现场留痕"}</h2><p>{item.textContent || item.caption || readableFileName(item.fileName) || "已上传现场素材"}</p><time>{item.createdAt ? new Date(item.createdAt).toLocaleString("zh-CN") : ""}</time></div>
+    </article>)}</section>
+    {!items.length ? <Empty /> : null}
+    {preview?<div className="trace-lightbox" role="dialog" aria-modal="true" aria-label="现场图片预览" onMouseDown={event=>{if(event.target===event.currentTarget)setPreview(null)}}><div className={`trace-lightbox-panel ${previewMode}`}>
+      <header><div><small>{preview.memberName || "未标记成员"} · {preview.companyName || "未标记站点"}</small><strong>{preview.title || "现场留痕"}</strong></div><div className="trace-view-controls"><button className={previewMode==="fit"?"active":""} type="button" onClick={()=>setPreviewMode("fit")} title="适应窗口"><Minimize2 size={17}/><span>适应窗口</span></button><button className={previewMode==="width"?"active":""} type="button" onClick={()=>setPreviewMode("width")} title="铺满宽度"><Maximize2 size={17}/><span>铺满宽度</span></button><button type="button" onClick={()=>setPreview(null)} title="关闭预览" aria-label="关闭预览"><X size={20}/></button></div></header>
+      <div className="trace-lightbox-image"><img src={preview.url} alt={preview.caption||preview.title||"现场图片原图"}/></div>
+      <footer><div><p>{preview.textContent || preview.caption || readableFileName(preview.fileName) || "该图片暂无文字说明"}</p><time>{preview.createdAt ? new Date(preview.createdAt).toLocaleString("zh-CN") : ""}</time></div><a href={preview.url} target="_blank" rel="noreferrer">新窗口打开<ExternalLink size={15}/></a></footer>
+    </div></div>:null}
+  </div>;
 }
 
 function readableFileName(value) {

@@ -8,6 +8,13 @@
     <link rel="icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>2026 RBCC · 红鸟挑战赛企业调研</title>
+    <script>
+      try {
+        const theme = localStorage.getItem("rbcc-theme") || "dark";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
