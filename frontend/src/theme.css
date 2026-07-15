@@ -15,8 +15,8 @@ html[data-theme="light"] :is(.brand-icon,.desktop-bridge) svg,html[data-theme="l
 html[data-theme="light"] :is(input,textarea,select){border-color:#d4d4d4!important;background:#fff!important;color:#171717!important}
 html[data-theme="light"] :is(input,textarea)::placeholder{color:#a3a3a3}
 html[data-theme="light"] :is(.tabs button,.primary-button,.quiet-button,.icon-text,.dashboard-actions button,.warroom-controls button,.warroom-controls select,.canvas-tools button,.design-actions button,.design-actions a,.admin-heading button,.knowledge-heading>button,.source-list>header button,.problem-review button,.roadshow-transport button){border-color:#d4d4d4;background:#fff;color:#404040}
-html[data-theme="light"] :is(.primary-button,.knowledge-search button){border-color:#171717;background:#171717;color:#fff}
-html[data-theme="light"] :is(.tabs button.active,.warroom-controls button.active){border-color:#171717;background:#171717;color:#fff}
+html[data-theme="light"] :is(.primary-button,.knowledge-search button){border-color:#0070f3;background:#0070f3;color:#fff}
+html[data-theme="light"] :is(.tabs button.active,.warroom-controls button.active){border-color:#93c5fd;background:#eef6ff;color:#075985}
 
 html[data-theme="light"] :is(.collab-summary,.update-form,.task-list article,.member-grid article,.milestone-overview,.perspective-card,.synthesis-board>article,.member-deep-grid>article,.evidence-chain,.collab-operations>article,.all-tasks,.all-tasks article,.route-milestones article,.trace-card,.knowledge-list article,.knowledge-form,.source-upload,.source-list,.knowledge-results article,.knowledge-doc-grid article,.install-page article,.admin-login form,.admin-kpis,.admin-overview article,.admin-routes article,.admin-reports>form,.admin-report-list,.admin-edit-card,.admin-route-editor details,.dashboard-context,.agent-context,.editor-block,.report-agent,.agent-chat,.knowledge-side>article,.review-guide article,.representative-sites article,.report-row,.roadshow-console,.scene-rail button,.design-preview,.preview-grid article,.capture-card,.synthesis-panel,.field-workspace,.field-questions>article,.route-reference,.reference-question-list article,.review-stages,.report-version-strip>span){border-color:#e5e5e5!important;background:#fff!important;box-shadow:none!important}
 html[data-theme="light"] :is(.perspective-card.selected,.scene-rail button.active,.reference-question-list article:hover,.site-scroller button.active,.identity-list button:hover){border-color:#a3a3a3!important;background:#f5f5f5!important}
@@ -30,21 +30,52 @@ html[data-theme="light"] :is(.lane-sites span,.topology-chain span,.preview-lane
 html[data-theme="light"] .trace-lightbox{background:rgba(245,245,245,.92)}
 html[data-theme="light"] .trace-lightbox-panel{border-color:#d4d4d4;background:#fff;box-shadow:0 24px 80px rgba(0,0,0,.18)}
 html[data-theme="light"] .trace-lightbox-panel>header button{border-color:#d4d4d4;background:#fff;color:#171717}
-html[data-theme="light"] .trace-view-controls button.active{border-color:#171717;background:#171717;color:#fff}
-html[data-theme="light"] .theme-toggle{border-color:#d4d4d4;background:#171717;color:#fff;box-shadow:0 8px 26px rgba(0,0,0,.16)}
+html[data-theme="light"] .trace-view-controls button.active{border-color:#93c5fd;background:#eef6ff;color:#075985}
+html[data-theme="light"] .theme-toggle{border-color:#d4d4d4;background:#fff;color:#171717;box-shadow:0 8px 26px rgba(0,0,0,.12)}
 
 html[data-theme="light"] :is(.field-app,.identity-page){background:#fff!important;color:#171717}
 html[data-theme="light"] :is(.mobile-header,.identity-page>header,.field-desktop-links,.mobile-nav,.identity-page>nav){border-color:#e5e5e5;background:rgba(255,255,255,.97);color:#171717}
 html[data-theme="light"] :is(.mobile-header button,.identity-page>header button,.field-desktop-links>a,.identity-list>button,.site-scroller button,.field-panel-actions button,.field-questions>article>button){border-color:#d4d4d4;background:#fff;color:#404040}
 html[data-theme="light"] :is(.field-desktop-links nav a,.mobile-nav button,.identity-page>nav span){color:#737373}
 html[data-theme="light"] :is(.field-desktop-links nav a:hover,.mobile-nav button.active){background:#f5f5f5;color:#171717}
-html[data-theme="light"] .site-scroller button.active{border-color:#171717!important;background:#171717!important;color:#fff!important}
-html[data-theme="light"] .site-scroller button.active strong{color:#fff}
+html[data-theme="light"] .site-scroller button.active{border-color:#93c5fd!important;background:#eef6ff!important;color:#075985!important}
+html[data-theme="light"] .site-scroller button.active strong{color:#075985}
 html[data-theme="light"] :is(.field-questions>article>span,.group-index,.member-avatar,.avatar){background:#f0f7ff;color:#0070f3}
 html[data-theme="light"] .field-questions>article>button{color:#d92d4f}
 html[data-theme="light"] :is(.field-evidence>form,.field-evidence>section,.closure-ledger,.ledger-problem,.ledger-solution){border-color:#e5e5e5;background:#fff}
 html[data-theme="light"] :is(.route-reference button,.file-button){border-color:#d4d4d4;background:#fff;color:#404040}
 html[data-theme="light"] .reference-evidence-pack{border-color:#ead9aa;background:#fffbeb}
 html[data-theme="light"] .question-draft-notice{border-color:#ddd6fe;background:#f5f3ff}
+
+html[data-theme="light"] :is(.agent-chat,.knowledge-side>section){border-color:#e5e5e5!important;background:#fff!important;box-shadow:none!important}
+html[data-theme="light"] .agent-chat>header{border-color:#e5e5e5;background:#fff}
+html[data-theme="light"] .agent-chat header p{color:#737373}
+html[data-theme="light"] .chat-messages{background:#fff}
+html[data-theme="light"] .chat-messages article>span{background:#f5f5f5;color:#525252}
+html[data-theme="light"] .chat-messages article>div{border-color:#e5e5e5;background:#f5f5f5;color:#171717}
+html[data-theme="light"] .chat-messages article.user>div{border-color:#bfdbfe;background:#eef6ff;color:#172554}
+html[data-theme="light"] .chat-messages aside{border-color:#dbeafe;color:#0369a1}
+html[data-theme="light"] .chat-messages aside small{color:#64748b}
+html[data-theme="light"] .chat-suggestions button{border-color:#d4d4d4;background:#fff;color:#404040}
+html[data-theme="light"] .chat-suggestions button:hover{border-color:#93c5fd;background:#eef6ff;color:#075985}
+html[data-theme="light"] .agent-chat>form{border-color:#e5e5e5;background:#fafafa}
+html[data-theme="light"] .agent-chat>form input{border-color:#d4d4d4!important;background:#fff!important;color:#171717!important}
+html[data-theme="light"] .agent-chat>form button{border:1px solid #0070f3;background:#0070f3;color:#fff}
+html[data-theme="light"] .agent-setup{border-color:#fecdd3!important;background:#fff7f8!important}
+html[data-theme="light"] .agent-setup>button{border-color:#d4d4d4;background:#fff;color:#404040}
+html[data-theme="light"] .knowledge-side>section{color:#171717}
+html[data-theme="light"] .knowledge-stats span{border-color:#e5e5e5;background:#fafafa}
+html[data-theme="light"] :is(.knowledge-side header button,.knowledge-side form button){border-color:#0070f3;background:#0070f3;color:#fff}
+html[data-theme="light"] .knowledge-side-list article{border-color:#e5e5e5}
+html[data-theme="light"] .knowledge-side-list p{color:#737373}
+html[data-theme="light"] :is(.collab-hero button,.all-tasks article>button,.report-link>button,.lane-sites button,.node-grid>button){border-color:#d4d4d4;background:#fff;color:#404040}
+html[data-theme="light"] :is(.collab-hero button,.report-link>button,.lane-sites button,.node-grid>button):hover{border-color:#93c5fd;background:#eef6ff;color:#075985}
+html[data-theme="light"] .all-tasks article>button{color:#168653}
+html[data-theme="light"] .lane-sites button.complete{border-color:#a7d7c0;background:#f0fdf4;color:#166534}
+html[data-theme="light"] .lane-sites button small{color:#737373}
+html[data-theme="light"] .node-filters{background:rgba(255,255,255,.96)}
+html[data-theme="light"] .node-filters>label{border-color:#d4d4d4;background:#fff}
+html[data-theme="light"] .node-grid>button.selected{border-color:#93c5fd;background:#eef6ff;color:#075985}
+html[data-theme="light"] .node-grid aside{border-color:#bfdbfe;background:#f0f7ff;color:#525252}
 
 @media(max-width:700px){.theme-toggle{right:14px;bottom:84px;width:42px;padding:0}.theme-toggle span{display:none}}
