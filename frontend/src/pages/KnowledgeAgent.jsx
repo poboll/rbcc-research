@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Bot, BookOpen, Send, Sparkles, UserRound } from "lucide-react";
 import { json, jsonOptions } from "../api.js";
 import { Loading } from "../components/Ui.jsx";
+import { Markdown } from "../components/Markdown.jsx";
 import { DEFAULT_MEMBER, TEAM } from "../team.js";
 
 const SUGGESTIONS = ["RBCC 四步流程是什么？", "中科新知是做什么的？", "开拓组和迭代组有什么区别？", "目前最大的证据缺口是什么？"];
 
 export function AgentChat({ memberId = DEFAULT_MEMBER.id, memberName = DEFAULT_MEMBER.name, companyId, companyName, mobile = false }) {
-  const [messages, setMessages] = useState([{ id:"welcome", role:"assistant", content:"我是红小八。我会检索问题库、现场留痕、知识库和方案，并区分事实、推断与待验证项。" }]);
+  const [messages, setMessages] = useState([{ id:"welcome", role:"assistant", content:"我是 **红小八**。我会检索问题库、现场留痕、知识库和方案，并明确区分：\n\n- **事实**：有现场记录或知识来源支持\n- **推断**：基于现有材料形成的判断\n- **待验证**：仍需要队员补充证据" }]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [mode, setMode] = useState("knowledge");
@@ -27,7 +28,7 @@ export function AgentChat({ memberId = DEFAULT_MEMBER.id, memberName = DEFAULT_M
   }
   return <section className={mobile ? "agent-chat mobile" : "agent-chat"}>
     <header><span className="agent-avatar"><Bot size={20}/></span><div><h2>红小八 <Sparkles size={13}/></h2><p>协同 Agent · {mode === "llm" ? "DeepSeek 增强" : "知识库检索"}</p></div></header>
-    <div className="chat-messages">{messages.map(message => <article className={message.role} key={message.id}><span>{message.role === "user" ? <UserRound size={14}/> : <Bot size={14}/>}</span><div><p>{message.content}</p>{message.citations?.length ? <aside><small>引用知识库</small>{message.citations.slice(0,3).map(item => <span key={item.id}>· {item.title}</span>)}</aside> : null}</div></article>)}{busy ? <div className="chat-thinking"><Loading compact label="红小八正在检索知识库…" /></div> : null}<div ref={endRef}/></div>
+    <div className="chat-messages">{messages.map(message => <article className={message.role} key={message.id}><span>{message.role === "user" ? <UserRound size={14}/> : <Bot size={14}/>}</span><div><Markdown className="chat-markdown">{message.content}</Markdown>{message.citations?.length ? <aside><small>引用知识库</small>{message.citations.slice(0,3).map(item => <span key={item.id}>· {item.title}</span>)}</aside> : null}</div></article>)}{busy ? <div className="chat-thinking"><Loading compact label="红小八正在检索知识库…" /></div> : null}<div ref={endRef}/></div>
     <div className="chat-suggestions">{SUGGESTIONS.map(text => <button disabled={busy} onClick={() => void ask(text)} key={text}>{text}</button>)}</div>
     <form onSubmit={event => {event.preventDefault();void ask(input);}}><input value={input} onChange={event=>setInput(event.target.value)} placeholder="问红小八，或让它帮你提炼调研材料…"/><button disabled={busy || !input.trim()} title="发送"><Send size={17}/></button></form>
   </section>;

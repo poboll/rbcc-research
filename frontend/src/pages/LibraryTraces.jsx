@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Archive, BookOpen, Camera, ExternalLink, FileText, Maximize2, Minimize2, Mic, Plus, Search, Trash2, X } from "lucide-react";
+import { Archive, BookOpen, Camera, ExternalLink, FileText, Maximize2, Minimize2, Mic, Plus, Search, Trash2, Users, X } from "lucide-react";
 import { json, jsonOptions } from "../api.js";
 import { Empty, ErrorState, Loading, Tabs } from "../components/Ui.jsx";
 import { useAsyncJson } from "../hooks.js";
-import { TEAM } from "../team.js";
+import { MEMBERS, TEAM } from "../team.js";
 
 export function LibraryPage() {
   const { data, loading, error, reload } = useAsyncJson("/api/knowledge");
@@ -20,10 +20,13 @@ export function LibraryPage() {
 
 export function TracesPage() {
   const [type, setType] = useState("all");
+  const [memberId, setMemberId] = useState("all");
   const [preview, setPreview] = useState(null);
   const [previewMode, setPreviewMode] = useState("width");
-  const { data, loading, error, reload } = useAsyncJson(`/api/media?groupId=${TEAM.id}${type === "all" ? "" : `&type=${type}`}`, [type]);
-  const items = data?.items ?? [];
+  const { data, loading, error, reload } = useAsyncJson(`/api/media?groupId=${TEAM.id}`);
+  const allItems = data?.items ?? [];
+  const items = useMemo(() => allItems.filter(item => (type === "all" || item.type === type) && (memberId === "all" || item.memberId === memberId)), [allItems, type, memberId]);
+  const memberCounts = useMemo(() => new Map(MEMBERS.map(member => [member.id, allItems.filter(item => item.memberId === member.id).length])), [allItems]);
   useEffect(() => {
     if (!preview) return undefined;
     const close = event => { if (event.key === "Escape") setPreview(null); };
@@ -35,8 +38,8 @@ export function TracesPage() {
   if (loading) return <Loading label="加载留痕库…" />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   return <div className="traces-page page-pad">
-    <header className="page-heading"><div><Archive size={20}/><span><small>留痕库</small><h1>现场证据与过程记录</h1><p>按成员与站点保存图片、录音和文字，点击图片可查看原始证据。</p></span></div><strong>{items.length} 条</strong></header>
-    <Tabs value={type} onChange={setType} items={[{value:"all",label:"全部"},{value:"image",label:"图片",icon:<Camera size={13}/>},{value:"audio",label:"录音",icon:<Mic size={13}/>},{value:"text",label:"文字",icon:<FileText size={13}/>}]}/>
+    <header className="page-heading"><div><Archive size={20}/><span><small>留痕库</small><h1>现场证据与过程记录</h1><p>按成员与站点保存图片、录音和文字，点击图片可查看原始证据。</p></span></div><strong>{items.length}{items.length !== allItems.length ? ` / ${allItems.length}` : ""} 条</strong></header>
+    <div className="trace-filters"><Tabs value={type} onChange={setType} items={[{value:"all",label:"全部类型"},{value:"image",label:"图片",icon:<Camera size={13}/>},{value:"audio",label:"录音",icon:<Mic size={13}/>},{value:"text",label:"文字",icon:<FileText size={13}/>}]}/><label><Users size={14}/><span>提交成员</span><select value={memberId} onChange={event=>setMemberId(event.target.value)}><option value="all">全部成员 · {allItems.length}</option>{MEMBERS.map(member=><option value={member.id} key={member.id}>{member.name} · {memberCounts.get(member.id)||0}</option>)}</select></label></div>
     <section className="trace-grid">{items.slice(0,160).map(item => <article className={`trace-card ${item.type}`} key={item.id}>
       {item.type==="image"&&item.url?<button className="trace-media-button" type="button" onClick={()=>{setPreviewMode("width");setPreview(item)}} aria-label={`预览图片：${item.caption||item.title||item.fileName||"现场图片"}`}><img className="trace-preview" src={item.url} alt={item.caption||item.title||"现场图片"} loading="lazy"/><span><Maximize2 size={16}/>查看原图</span></button>:item.type==="audio"&&item.url?<div className="trace-audio-wrap"><span><Mic size={20}/></span><audio className="trace-audio" src={item.url} controls preload="metadata"/></div>:<div className={`trace-kind ${item.type}`}>{item.type === "image" ? <Camera/> : item.type === "audio" ? <Mic/> : <FileText/>}</div>}
       <div className="trace-card-body"><small>{item.memberName || "未标记成员"} · {item.companyName || "未标记站点"}</small><h2>{item.title || "现场留痕"}</h2><p>{item.textContent || item.caption || readableFileName(item.fileName) || "已上传现场素材"}</p><time>{item.createdAt ? new Date(item.createdAt).toLocaleString("zh-CN") : ""}</time></div>

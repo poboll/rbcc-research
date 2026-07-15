@@ -11,6 +11,7 @@ import "./collab-readable.css";
 import "./traces-readable.css";
 import "./agent-polish.css";
 import "./review-polish.css";
+import "./system-polish.css";
 import "./theme.css";
 
 createRoot(document.getElementById("root")).render(

@@ -1,0 +1,73 @@
+/* Shared operational UI: traces, collaboration, war room and Agent output. */
+.trace-filters{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.trace-filters>label{display:flex;align-items:center;gap:7px;color:var(--muted2);font-size:11px}
+.trace-filters>label>svg{color:var(--cyan)}
+.trace-filters select{min-width:190px;height:34px;border:1px solid var(--line2);border-radius:6px;background:var(--bg);color:var(--text);padding:0 30px 0 9px}
+.traces-page .trace-card-body{min-width:0}
+.traces-page .trace-card-body :is(h2,p,small,time){overflow-wrap:anywhere}
+
+.chat-markdown{display:grid;gap:8px;min-width:0;font-size:13px;line-height:1.7;overflow-wrap:anywhere}
+.chat-markdown :is(p,h3,h4,h5,ul,ol,blockquote,pre){margin:0}
+.chat-markdown h3{font-size:15px;line-height:1.4}
+.chat-markdown h4{font-size:14px;line-height:1.45}
+.chat-markdown h5{font-size:13px;line-height:1.5}
+.chat-markdown strong{color:inherit;font-weight:700}
+.chat-markdown em{color:var(--muted2)}
+.chat-markdown ul,.chat-markdown ol{display:grid;gap:4px;padding-left:20px}
+.chat-markdown li{padding-left:2px}
+.chat-markdown blockquote{border-left:3px solid var(--violet);background:rgba(169,155,234,.08);padding:8px 10px;color:var(--muted2)}
+.chat-markdown code{border:1px solid var(--line);border-radius:4px;background:var(--bg);padding:1px 5px;color:var(--cyan);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.chat-markdown pre{max-width:100%;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:10px}
+.chat-markdown pre code{border:0;background:transparent;padding:0;color:var(--text);white-space:pre}
+.chat-markdown a{color:var(--cyan);text-decoration:underline;text-underline-offset:2px}
+.chat-messages article.user .chat-markdown a{color:#1d4ed8}
+
+.collab-shell .module-header{border-bottom-color:var(--line);background:rgba(8,11,15,.96);box-shadow:0 1px 0 rgba(41,195,210,.08)}
+.collab-shell .desktop-bridge{background:var(--surface);border-color:var(--line2)}
+.milestone-hub{max-width:1380px}
+.milestone-hub .collab-hero{padding:6px 0 20px}
+.milestone-hub .collab-hero>div:last-child{align-items:center}
+.milestone-hub .collab-hero a,.milestone-hub .collab-hero button{min-height:36px;border-color:var(--line2);background:var(--surface);color:var(--muted2);padding:0 11px;font-size:10px}
+.milestone-hub .collab-hero .primary-button{border-color:var(--cyan);background:var(--cyan);color:#061014}
+.milestone-hub .collab-hero :is(a,button):hover{border-color:var(--cyan);background:var(--surface2);color:var(--text)}
+.milestone-hub .collab-hero .primary-button:hover{background:#45d2dc;color:#061014}
+.milestone-hub .perspective-card{cursor:pointer;position:relative}
+.milestone-hub .perspective-card::after{content:"查看详情";position:absolute;right:10px;bottom:10px;opacity:0;color:var(--cyan);font-size:9px;transition:opacity .18s}
+.milestone-hub .perspective-card:hover::after,.milestone-hub .perspective-card:focus-visible::after{opacity:1}
+.milestone-hub .perspective-card.selected{border-color:var(--cyan);box-shadow:inset 0 0 0 1px rgba(41,195,210,.18)}
+.milestone-hub .member-deep-dive{scroll-margin-top:86px;outline:0}
+.milestone-hub .thought-stream>div{max-height:620px;overflow:auto;padding-right:4px;overscroll-behavior:contain}
+.milestone-hub .mini-traces{min-width:0}
+.milestone-hub .mini-traces>span{display:block;min-width:0;overflow:hidden}
+.milestone-hub .mini-traces strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.milestone-hub .mini-traces small{display:-webkit-box!important;overflow:hidden;overflow-wrap:anywhere;word-break:break-word;white-space:normal!important;line-height:1.55;-webkit-box-orient:vertical;-webkit-line-clamp:3}
+
+.warroom-shell .topbar{background:rgba(8,11,15,.97);border-bottom-color:var(--line);box-shadow:0 1px 0 rgba(41,195,210,.08)}
+.warroom-shell .topbar nav a:hover{background:var(--surface);color:var(--text)}
+.warroom-shell .topbar nav a.active{border-color:rgba(41,195,210,.45);background:var(--cyan-bg);color:var(--cyan);box-shadow:none}
+.warroom-shell .subbar{background:var(--bg2);color:var(--muted2)}
+.warroom :is(.warroom-controls button,.warroom-controls select,.canvas-tools button,.overview-bar button,.lane-sites button,.review-jump,.report-link>a,.report-link>button){border:1px solid var(--line2);border-radius:6px;background:var(--surface);color:var(--muted2);box-shadow:none;transition:border-color .16s,background .16s,color .16s}
+.warroom :is(.warroom-controls button,.canvas-tools button,.overview-bar button,.lane-sites button,.review-jump,.report-link>a,.report-link>button):hover{border-color:var(--cyan);background:var(--surface2);color:var(--text)}
+.warroom :is(.warroom-controls button.active,.canvas-tools button.active){border-color:var(--cyan);background:var(--cyan-bg);color:var(--cyan)}
+.warroom .lane-sites button.complete{border-color:rgba(69,197,138,.45);background:rgba(69,197,138,.08);color:var(--green)}
+.warroom .review-jump{color:var(--amber)}
+
+html[data-theme="light"] .trace-filters{border-color:#e5e5e5;background:#fff}
+html[data-theme="light"] .chat-markdown blockquote{border-color:#6d4aff;background:#f5f3ff;color:#525252}
+html[data-theme="light"] .chat-markdown code{border-color:#e5e5e5;background:#fafafa;color:#075985}
+html[data-theme="light"] .collab-shell .module-header,html[data-theme="light"] .warroom-shell .topbar{border-color:#e5e5e5;background:rgba(255,255,255,.97)}
+html[data-theme="light"] .collab-shell .desktop-bridge{border-color:#d4d4d4;background:#fafafa}
+html[data-theme="light"] .milestone-hub .collab-hero a,html[data-theme="light"] .milestone-hub .collab-hero button{border-color:#d4d4d4;background:#fff;color:#404040}
+html[data-theme="light"] .milestone-hub .collab-hero .primary-button{border-color:#0070f3;background:#0070f3;color:#fff}
+html[data-theme="light"] .milestone-hub .perspective-card.selected{border-color:#60a5fa!important;background:#eef6ff!important;box-shadow:inset 0 0 0 1px #bfdbfe!important}
+html[data-theme="light"] .warroom :is(.warroom-controls button,.warroom-controls select,.canvas-tools button,.overview-bar button,.lane-sites button,.review-jump,.report-link>a,.report-link>button){border-color:#d4d4d4;background:#fff;color:#404040}
+html[data-theme="light"] .warroom :is(.warroom-controls button.active,.canvas-tools button.active){border-color:#93c5fd;background:#eef6ff;color:#075985}
+
+@media(max-width:700px){
+  .trace-filters{align-items:stretch;flex-direction:column}
+  .trace-filters .tabs{flex-wrap:nowrap;overflow-x:auto}
+  .trace-filters .tabs button{flex:0 0 auto}
+  .trace-filters>label{justify-content:space-between}
+  .trace-filters select{min-width:0;flex:1}
+  .milestone-hub .perspective-card::after{opacity:1}
+}

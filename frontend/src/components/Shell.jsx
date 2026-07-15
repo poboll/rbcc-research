@@ -20,7 +20,7 @@ export { AppLink };
 export function Shell({ pathname, children, subtitle, bare = false }) {
   if (bare) return children;
   const usesScreenNav = pathname === "/" || pathname.startsWith("/screen") || pathname === "/design";
-  const shellClass = pathname.startsWith("/review") ? "app-shell review-shell" : "app-shell";
+  const shellClass = ["app-shell", pathname.startsWith("/review") ? "review-shell" : "", pathname === "/collab" ? "collab-shell" : "", pathname === "/" || pathname === "/screen" ? "warroom-shell" : ""].filter(Boolean).join(" ");
   return <div className={shellClass}>
     {usesScreenNav ? <header className="topbar">
       <AppLink href="/screen" className="brand">
