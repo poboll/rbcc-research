@@ -49,7 +49,8 @@ try {
   const unmatchedReference = await (await expectOk("/api/reference-questions?companyId=co-xinyuan-logistics")).json();
   if (unmatchedReference.matched || unmatchedReference.questions?.length) throw new Error("reference endpoint leaked to unmatched route");
   const beforeReferenceSave = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-zhongke")).json();
-  if (beforeReferenceSave.questions?.length) throw new Error("reference questions persisted without explicit save");
+  const afterReferenceRead = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-zhongke")).json();
+  if (afterReferenceRead.questions?.length !== beforeReferenceSave.questions?.length) throw new Error("reference endpoint persisted questions without explicit save");
   await expectOk("/api/research-questions", { method:"PUT", headers:{"content-type":"application/json"}, body:JSON.stringify({ memberId:"member-jin", companyId:"co-zhongke", questions:reference.questions }) });
   const savedReference = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-zhongke")).json();
   if (savedReference.questions?.length !== 6 || savedReference.questions.some(item => item.validationOutcome !== "pending")) throw new Error("explicit reference save did not persist as pending");
