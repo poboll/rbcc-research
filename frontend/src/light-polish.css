@@ -76,3 +76,23 @@ html[data-theme="light"] .scene-rail button.active{
 html[data-theme="light"] .scene-rail button.active em{
   color:#526273;
 }
+html[data-theme="light"] .review-page :is(.report-link>a,.report-link>button,.review-jump,.review-empty>a){
+  border-color:#d4d4d4;
+  background:#fff;
+  color:#404040;
+}
+html[data-theme="light"] .review-page :is(.report-link>a,.report-link>button,.review-jump,.review-empty>a):hover{
+  border-color:#93c5fd;
+  background:#eef6ff;
+  color:#075985;
+}
+html[data-theme="light"] .dashboard-page .dashboard-actions button:not(.primary-button){
+  border-color:#d4d4d4;
+  background:#fff;
+  color:#404040;
+}
+html[data-theme="light"] .dashboard-page .dashboard-actions button:not(.primary-button):hover:not(:disabled){
+  border-color:#93c5fd;
+  background:#eef6ff;
+  color:#075985;
+}

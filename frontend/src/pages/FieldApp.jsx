@@ -4,7 +4,8 @@ import { json, jsonOptions } from "../api.js";
 import { AppLink } from "../components/Shell.jsx";
 import { Empty, Loading, StatusDot, Tabs } from "../components/Ui.jsx";
 import { AgentChat } from "./KnowledgeAgent.jsx";
-import { MEMBERS, TEAM } from "../team.js";
+import { compressFieldImage, formatFileSize } from "../image-compression.js";
+import { AGENT_NAME, MEMBERS, TEAM } from "../team.js";
 
 export function FieldApp({ search }) {
   const [memberId, setMemberId] = useState(() => new URLSearchParams(search).get("memberId") || localStorage.getItem("rbcc-member-id") || "");
@@ -12,20 +13,20 @@ export function FieldApp({ search }) {
   const member = MEMBERS.find(item => item.id === memberId);
   useEffect(() => { if (memberId) localStorage.setItem("rbcc-member-id", memberId); }, [memberId]);
   if (!member) return <IdentityPicker onSelect={setMemberId} />;
-  return <div className="field-app"><DesktopLinks memberId={memberId}/><header className="mobile-header"><div><small>{TEAM.shortName} · 队员端</small><strong>{member.name}</strong></div><button onClick={() => setMemberId("")}><UserRound size={16}/>切换身份</button></header><section className="field-titlebar"><div><MapPin size={20}/><span><small>{member.name} · 现场调研</small><h1>现场调研工作台</h1><p>{tab === "route" ? "问题预设、现场验证与证据闭环" : "红小八辅助提炼现场材料"}</p></span></div><div><StatusDot label="数据已连接"/><AppLink href={`/screen?memberId=${memberId}`}><Monitor size={15}/>查看个人大屏</AppLink></div></section><div className="field-content">{tab === "agent" ? <AgentChat memberId={memberId} memberName={member.name} mobile/> : <RouteCapture member={member}/>}</div><nav className="mobile-nav"><button className={tab === "route" ? "active" : ""} onClick={() => setTab("route")}><Route size={21}/>走访路线</button><button className={tab === "agent" ? "active" : ""} onClick={() => setTab("agent")}><Bot size={21}/>红小八</button><AppLink href={`/screen?memberId=${memberId}`}><Monitor size={21}/>个人大屏</AppLink></nav></div>;
+  return <div className="field-app"><DesktopLinks memberId={memberId}/><header className="mobile-header"><div><small>{TEAM.shortName} · 队员端</small><strong>{member.name}</strong></div><button onClick={() => setMemberId("")}><UserRound size={16}/>切换身份</button></header><section className="field-titlebar"><div><MapPin size={20}/><span><small>{member.name} · 现场调研</small><h1>现场调研工作台</h1><p>{tab === "route" ? "问题预设、现场验证与证据闭环" : `${AGENT_NAME}辅助提炼现场材料`}</p></span></div><div><StatusDot label="数据已连接"/><AppLink href={`/screen?memberId=${memberId}`}><Monitor size={15}/>查看个人大屏</AppLink></div></section><div className="field-content">{tab === "agent" ? <AgentChat memberId={memberId} memberName={member.name} mobile/> : <RouteCapture member={member}/>}</div><nav className="mobile-nav"><button className={tab === "route" ? "active" : ""} onClick={() => setTab("route")}><Route size={21}/>走访路线</button><button className={tab === "agent" ? "active" : ""} onClick={() => setTab("agent")}><Bot size={21}/>{AGENT_NAME}</button><AppLink href={`/screen?memberId=${memberId}`}><Monitor size={21}/>个人大屏</AppLink></nav></div>;
 }
 
 function IdentityPicker({ onSelect }) {
-  return <div className="identity-page"><DesktopLinks/><header><div><small>{TEAM.shortName} · 队员端</small><span>请先选择身份</span></div><button title="检查并加载最新版本"><RefreshCw size={15}/>立即更新</button></header><main><div className="phone-mark"><Smartphone size={30}/></div><h1>选择你的身份</h1><p>{TEAM.name} · {TEAM.theme}</p><small className="route-label"><i/>{TEAM.mascot}</small><div className="identity-list">{MEMBERS.map(member => <button key={member.id} onClick={() => onSelect(member.id)}><span className="avatar"><UserRound size={19}/></span><span><strong>{member.name}</strong><small>{member.role}</small></span><ChevronRight size={19}/></button>)}</div><section className="install-hint"><Download size={22}/><span><strong>安装到手机桌面</strong><p>使用浏览器菜单中的「添加到主屏幕」或「安装应用」。</p></span></section></main><nav><span><Route size={21}/>走访路线</span><span><Bot size={21}/>红小八</span></nav></div>;
+  return <div className="identity-page"><DesktopLinks/><header><div><small>{TEAM.shortName} · 队员端</small><span>请先选择身份</span></div><button title="检查并加载最新版本"><RefreshCw size={15}/>立即更新</button></header><main><div className="phone-mark"><Smartphone size={30}/></div><h1>选择你的身份</h1><p>{TEAM.name} · {TEAM.theme}</p><small className="route-label"><i/>{TEAM.mascot}</small><div className="identity-list">{MEMBERS.map(member => <button key={member.id} onClick={() => onSelect(member.id)}><span className="avatar"><UserRound size={19}/></span><span><strong>{member.name}</strong><small>{member.role}</small></span><ChevronRight size={19}/></button>)}</div><section className="install-hint"><Download size={22}/><span><strong>安装到手机桌面</strong><p>使用浏览器菜单中的「添加到主屏幕」或「安装应用」。</p></span></section></main><nav><span><Route size={21}/>走访路线</span><span><Bot size={21}/>{AGENT_NAME}</span></nav></div>;
 }
 
-function DesktopLinks({ memberId = "" }){return <aside className="field-desktop-links"><AppLink href={`/screen${memberId?`?memberId=${memberId}`:""}`}><Smartphone size={18}/><span><strong>智能呈现 · 桌面协同</strong><small>查看全组进度、受阻项与路演</small></span></AppLink><nav>{[["/","作战室"],["/traces","留痕库"],["/collab","协同 Hub"],["/knowledge","知识中心"],["/agent","红小八"],["/dashboard","调研报告"],["/review","评审"],["/library","节点库"],["/admin","管理端"]].map(([href,label])=><AppLink key={href} href={href}>{label}</AppLink>)}</nav></aside>}
+function DesktopLinks({ memberId = "" }){return <aside className="field-desktop-links"><AppLink href={`/screen${memberId?`?memberId=${memberId}`:""}`}><Smartphone size={18}/><span><strong>智能呈现 · 桌面协同</strong><small>查看全组进度、受阻项与路演</small></span></AppLink><nav>{[["/","作战室"],["/traces","留痕库"],["/collab","协同 Hub"],["/knowledge","知识中心"],["/agent",AGENT_NAME],["/dashboard","调研报告"],["/review","评审"],["/library","节点库"],["/admin","管理端"]].map(([href,label])=><AppLink key={href} href={href}>{label}</AppLink>)}</nav></aside>}
 
 function RouteCapture({ member }) {
   const [dashboard, setDashboard] = useState(null);
   const [active, setActive] = useState("");
   const [panel, setPanel] = useState("questions");
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestionsState] = useState([]);
   const [text, setText] = useState("");
   const [status, setStatus] = useState("");
   const [problem, setProblem] = useState({ title:"", evidence:"", severity:"normal" });
@@ -40,11 +41,34 @@ function RouteCapture({ member }) {
   const [problemNotes, setProblemNotes] = useState({});
   const [solutionResults, setSolutionResults] = useState({});
   const fileRef = useRef(null);
+  const questionsRef = useRef([]);
+  const deleteInFlightRef = useRef(new Set());
   function announceUpdate() { const value=String(Date.now()); localStorage.setItem("rbcc-research-updated",value); window.dispatchEvent(new CustomEvent("rbcc:research-updated",{detail:value})); }
 
   useEffect(() => { json(`/api/research-dashboard?memberId=${member.id}`).then(value => { setDashboard(value); setActive(value.members?.[0]?.sites?.[0]?.companyId || ""); }); }, [member.id]);
   const sites = dashboard?.members?.[0]?.sites ?? [];
   const site = sites.find(item => item.companyId === active);
+  function setQuestions(next) {
+    const current = questionsRef.current;
+    const value = typeof next === "function" ? next(current) : next;
+    questionsRef.current = value;
+    setQuestionsState(value);
+    if (typeof next === "function" && value.length === current.length - 1) {
+      const retained = new Set(value.map(item => item.id));
+      const removed = current.find(item => item.id && !retained.has(item.id));
+      if (removed && !removed.id.startsWith("q-local-") && !deleteInFlightRef.current.has(removed.id)) {
+        deleteInFlightRef.current.add(removed.id);
+        queueMicrotask(async () => {
+          setStatus("正在永久删除问题…");
+          try {
+            await json(`/api/research-questions/${encodeURIComponent(removed.id)}?memberId=${encodeURIComponent(member.id)}&companyId=${encodeURIComponent(site?.companyId || "")}`, { method:"DELETE" });
+            setQuestionDraft(null); setStatus("问题已永久删除并同步到全组大屏。"); announceUpdate();
+          } catch (error) { setStatus(`删除失败：${error.message}`); await loadSite(); }
+          finally { deleteInFlightRef.current.delete(removed.id); }
+        });
+      }
+    }
+  }
 
   async function loadSite() {
     if (!site) return;
@@ -81,9 +105,16 @@ function RouteCapture({ member }) {
 
   async function upload(event) {
     event.preventDefault(); if (!site || (!text.trim() && !fileRef.current?.files?.[0])) return;
-    const form = new FormData(); form.set("memberId",member.id);form.set("memberName",member.name);form.set("groupId",TEAM.id);form.set("companyId",site.companyId);form.set("companyName",site.companyName);
-    const file=fileRef.current?.files?.[0];form.set("type",file?.type?.startsWith("audio/")?"audio":file?"image":"text");form.set("evidenceKind",evidenceKind);form.set("title","现场留痕");form.set("caption",text.trim());if(text.trim())form.set("textContent",text.trim());if(file)form.set("file",file);
-    setBusy("upload");setStatus("上传中…");const response=await fetch("/api/media/upload",{method:"POST",body:form});setStatus(response.ok?"已同步到留痕库、证据链与全组大屏":"上传失败");if(response.ok){setText("");if(fileRef.current)fileRef.current.value="";announceUpdate();await loadSite()}setBusy("");
+    setBusy("upload");
+    try {
+      const selectedFile=fileRef.current?.files?.[0];let uploadFile=selectedFile;let compression=null;
+      if(selectedFile?.type?.startsWith("image/")){setStatus("正在压缩现场照片…");compression=await compressFieldImage(selectedFile);uploadFile=compression.file}
+      const form = new FormData(); form.set("memberId",member.id);form.set("memberName",member.name);form.set("groupId",TEAM.id);form.set("companyId",site.companyId);form.set("companyName",site.companyName);
+      form.set("type",uploadFile?.type?.startsWith("audio/")?"audio":uploadFile?"image":"text");form.set("evidenceKind",evidenceKind);form.set("title","现场留痕");form.set("caption",text.trim());if(text.trim())form.set("textContent",text.trim());if(uploadFile)form.set("file",uploadFile);
+      setStatus(compression?.compressed?`上传中 · ${formatFileSize(compression.originalBytes)} → ${formatFileSize(compression.outputBytes)} WebP`:"上传中…");
+      const response=await fetch("/api/media/upload",{method:"POST",body:form});const payload=await response.json().catch(()=>({}));if(!response.ok)throw new Error(payload.error||"上传失败");
+      setStatus(compression?.compressed?`照片已压缩为 ${formatFileSize(compression.outputBytes)} WebP，并同步到证据链。`:"已同步到留痕库、证据链与全组大屏");setText("");if(fileRef.current)fileRef.current.value="";announceUpdate();await loadSite();
+    } catch(error){setStatus(error.message)}finally{setBusy("")}
   }
   async function addProblem(event){event.preventDefault();if(!site)return;await json("/api/problems",jsonOptions("POST",{...problem,groupId:TEAM.id,memberId:member.id,memberName:member.name,companyId:site.companyId,companyName:site.companyName,validationOutcome:"pending"}));setProblem({title:"",evidence:"",severity:"normal"});setStatus("痛点已加入田野问题库并同步到全组大屏。");announceUpdate();await loadSite()}
   async function addSolution(event){event.preventDefault();if(!site)return;const confirmed=problems.filter(item=>item.validationOutcome==="confirmed");if(!confirmed.length){setStatus("请先确认至少一条痛点，再创建试点方案。");return}await json("/api/solutions",jsonOptions("POST",{...solution,metrics:solution.metrics.split(/[，,]/).map(value=>value.trim()).filter(Boolean),groupId:TEAM.id,memberId:member.id,memberName:member.name,companyId:site.companyId,companyName:site.companyName,linkedProblemIds:confirmed.slice(0,5).map(item=>item.id),validationStatus:"draft"}));setSolution({title:"",description:"",testPlan:"",metrics:""});setStatus("方案已创建、挂钩痛点并同步到全组大屏。");announceUpdate();await loadSite()}

@@ -6,35 +6,35 @@
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#020617",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
   "orientation": "portrait-primary",
   "lang": "zh-CN",
   "icons": [
     {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
+      "src": "/api/agent-icon?v=1",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
+      "src": "/api/agent-icon?v=1",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
+      "src": "/api/agent-icon?v=1",
+      "sizes": "any",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
   "shortcuts": [
     {
-      "name": "红小九",
+      "name": "红八宝",
       "url": "/agent",
-      "description": "流光九径知识 Agent"
+      "description": "第八组调研协同 Agent"
     },
     {
       "name": "上传留痕",

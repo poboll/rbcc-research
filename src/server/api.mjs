@@ -313,6 +313,11 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     const state = await store.get();
     const { pathname, searchParams } = url;
 
+    if (pathname === "/api/agent-icon" && req.method === "GET") {
+      const response = await fetch("https://img.remit.ee/api/file/BQACAgUAAyEGAASHRsPbAAEXVSxqWMufYhdzMwUsUu83WWjOFYaH1wACei0AAm1OwFavQ2V2NGQbkj0E.png");
+      if (!response.ok) return json({ error:"Agent 图标暂时不可用" },502);
+      return { status:200, body:Buffer.from(await response.arrayBuffer()), type:"image/png", headers:{"cache-control":"public, max-age=86400, s-maxage=31536000, immutable"} };
+    }
     if (req.method === "GET" && pathname === "/api/team-config") return json(state.teamConfig ?? null);
     if (req.method === "GET" && pathname === "/api/llm/status") return json(llmStatus());
     if (req.method === "GET" && pathname === "/api/reference-questions") {
@@ -440,6 +445,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     if (pathname === "/api/media/upload" && req.method === "POST") {
       const { fields, file } = await parseMultipart(req, uploadRoot);
       if(file&&(!MEDIA_TYPES.has(file.mimeType)||!validFileSignature(file)))return json({error:"文件类型或文件内容不受支持"},415);
+      if(file&&fields.type==="image"&&file.size>2*1024*1024)return json({error:"图片仍大于 2MB，请刷新队员端后重新选择，系统会自动压缩为 WebP"},413);
       const blob = await persistBlob(fields, file, "evidence");
       const item = record({ ...fields, evidenceKind: fields.evidenceKind || (fields.type === "audio" ? "quote" : "observation"), synthesisStatus:"pending", linkedProblemIds:[], durationSec: fields.durationSec ? Number(fields.durationSec) : undefined, fileName: file?.originalName, storedName:file?.storedName, mimeType: file?.mimeType, fileSize: file?.size, blobPathname: blob?.pathname, cloudSynced: Boolean(blob) || !process.env.VERCEL }, "media");
       if(file)item.url=`/api/media/file/${item.id}`;
@@ -564,7 +570,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       let mode = "knowledge";
       try {
         reply = await complete([
-          { role: "system", content: `你是 RBCC ${state.teamConfig?.group?.name ?? "调研组"}协同 Agent 红小八。回答必须基于提供的调研材料，优先指出一手证据、已验证结论、证据缺口和下一步动作。禁止捏造访谈、数字、企业事实或引用。用简洁中文回答。` },
+          { role: "system", content: `你是 RBCC ${state.teamConfig?.group?.name ?? "调研组"}协同 Agent 红八宝。优先使用提供的本组调研材料回答，并区分一手证据、已验证结论、证据缺口和下一步动作。如果材料没有覆盖用户问题，可以使用模型通识知识完整回答，但必须在对应内容前标注“通识补充（非本组现场证据）”。不得把通识内容伪装成访谈、企业事实、本组数字或引用；涉及具体企业现场情况时明确说明仍待现场验证。用清晰、直接的中文回答。` },
           ...(input.history ?? []).slice(-8),
           { role: "user", content: `问题：${input.message}\n当前站点：${input.companyName ?? input.companyId ?? "全组"}\n材料：${JSON.stringify(context).slice(0, 45_000)}` }
         ], { maxTokens: 1800 });
@@ -585,6 +591,17 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       }
     }
 
+    if (pathname.startsWith("/api/research-questions/") && req.method === "DELETE") {
+      const memberId = searchParams.get("memberId"), companyId = searchParams.get("companyId"), id = decodeURIComponent(pathname.split("/").pop());
+      if (!memberId || !companyId || !id) return json({ error:"缺少成员、站点或问题 ID" },400);
+      let removed = false;
+      await store.update(value => {
+        const key = keyFor(memberId, companyId), questions = value.researchQuestions[key] ?? [];
+        const next = questions.filter(item => item.id !== id); removed = next.length !== questions.length;
+        if (removed) value.researchQuestions[key] = next;
+      });
+      return removed ? json({ deleted:true, id }) : json({ error:"问题不存在或已删除" },404);
+    }
     if (pathname === "/api/research-questions") {
       if (req.method === "GET") {
         const memberId = searchParams.get("memberId"), companyId = searchParams.get("companyId");

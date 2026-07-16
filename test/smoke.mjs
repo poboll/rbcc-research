@@ -64,6 +64,11 @@ try {
   await expectOk("/api/research-questions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ memberId: "member-jin", companyId: "co-xinyuan-logistics", questions: generatedQuestions }) });
   const persistedQuestions = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-xinyuan-logistics")).json();
   if (persistedQuestions.questions?.length !== 18) throw new Error("research question persistence mismatch");
+  const deletedQuestionId = persistedQuestions.questions[4].id;
+  await expectOk(`/api/research-questions/${encodeURIComponent(deletedQuestionId)}?memberId=member-jin&companyId=co-xinyuan-logistics`, { method:"DELETE" });
+  const afterQuestionDelete = await (await expectOk("/api/research-questions?memberId=member-jin&companyId=co-xinyuan-logistics")).json();
+  if (afterQuestionDelete.questions?.length !== 17 || afterQuestionDelete.questions.some(item => item.id === deletedQuestionId)) throw new Error("single question deletion did not persist");
+  await expectOk("/api/research-questions", { method:"PUT", headers:{"content-type":"application/json"}, body:JSON.stringify({memberId:"member-jin",companyId:"co-xinyuan-logistics",questions:persistedQuestions.questions}) });
   const questionDraft = await (await expectOk("/api/research-report/suggest", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ memberId: "member-jin", companyId: "co-xinyuan-logistics" }) })).json();
   if (questionDraft.questions?.length !== 18 || questionDraft.dimensionCount < 9) throw new Error("diverse question generation mismatch");
   if (new Set(questionDraft.questions.map(item => item.text)).size !== 18) throw new Error("generated questions contain exact duplicates");

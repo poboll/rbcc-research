@@ -7,6 +7,9 @@ export const TEAM = {
   event: "2026 RBCC 企业调研"
 };
 
+export const AGENT_NAME = "红八宝";
+export const AGENT_ICON = "/api/agent-icon?v=1";
+
 export const MEMBER_IDS = ["member-jin", "member-lin", "member-zhong", "member-han", "member-su", "team-8"];
 
 export const MEMBERS = [
