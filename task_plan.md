@@ -11,6 +11,9 @@
 - [complete] 3. 生成增量问题验证、证据记录和四核报告
 - [complete] 4. 预演校验并写入 164 生产环境
 - [complete] 5. 验证刷新持久化、页面比例和报告可读性
+- [complete] 6. 修复管理员 DOCX 中文文件名乱码并校正现有定稿元数据
+- [complete] 7. 修正管理端定稿撤下、持久化状态和报告去重计数
+- [complete] 8. 部署 164 生产环境并完成桌面、手机端页面验收
 
 ## 数据原则
 
@@ -29,3 +32,5 @@
 | 报告抽查 shell 循环 URL 参数拆分错误 | 1 | 改用 Node `fetch()` 明确传入 memberId/companyId，确认网站接口正常 |
 | 草稿 16 小节已填但完整度沿用生成前旧值 | 1 | 在 `baseReport` 返回时按最终 sections 重新计算完整度 |
 | 应用内浏览器没有可用标签，创建测试页未挂接 | 1 | 不宣称截图通过；改用生产 API、重启持久化和服务健康检查完成验收 |
+| 使用项目不存在的 `/api/health` 做发布检查 | 1 | 改用首页、`/api/research-dashboard` 与生产域名验证 |
+| 浏览器样式检查误用 `tab.playwright.screenshot` | 1 | 改用受支持的 `tab.screenshot` 完成截图验收 |

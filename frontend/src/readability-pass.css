@@ -1,0 +1,42 @@
+/* Final readability floor for evaluation and knowledge-heavy desktop surfaces. */
+.review-member-nav a,
+.review-page .review-jump,
+.review-page .report-link>a{font-size:11px}
+.review-guide p,
+.representative-sites>header p,
+.representative-sites small,
+.representative-sites a,
+.review-empty span small,
+.review-page .report-owner small,
+.review-stages small{font-size:11px!important;line-height:1.45}
+.review-guide h2,.representative-sites strong{font-size:12px}
+.review-page .report-row{min-height:78px}
+
+.agent-workspace{grid-template-columns:minmax(0,1.55fr) minmax(360px,.82fr)}
+.agent-chat{height:clamp(570px,calc(100vh - 210px),660px)}
+.agent-chat>header p,
+.agent-context label,
+.agent-context select,
+.knowledge-stats small,
+.knowledge-side-list strong{font-size:11px}
+.knowledge-side-list p{font-size:10.5px;line-height:1.65}
+
+.knowledge-flow small,
+.knowledge-kpis small,
+.source-list small,
+.source-list article>span,
+.knowledge-results small,
+.knowledge-doc-grid small{font-size:10.5px!important;line-height:1.45}
+.knowledge-heading-actions :is(a,button),
+.knowledge-handoff>a,
+.knowledge-results article>footer a{font-size:11px}
+
+.admin-report-list strong{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.admin-report-list strong em{border:1px solid var(--line2);border-radius:5px;padding:2px 6px;color:var(--violet);font-size:10px;font-style:normal;font-weight:600}
+.admin-report-list small{max-width:100%;font-size:11px!important;overflow-wrap:anywhere}
+
+@media(max-width:900px){.agent-workspace{grid-template-columns:1fr}.agent-chat{height:620px}}
+@media(max-width:700px){
+  .review-guide p,.representative-sites small,.review-page .report-owner small{font-size:11px!important}
+  .agent-chat{height:calc(100vh - 240px);min-height:570px}
+}

@@ -48,6 +48,14 @@ function safeName(value) {
   return String(value ?? "file").replace(/[^a-zA-Z0-9._-]/g, "_").slice(-100);
 }
 
+export function normalizeUploadFileName(value) {
+  const original = String(value || "file");
+  const decoded = Buffer.from(original, "latin1").toString("utf8");
+  const cjkCount = text => (text.match(/[\u3400-\u9fff]/g) || []).length;
+  const recovered = !decoded.includes("\ufffd") && cjkCount(decoded) > cjkCount(original) ? decoded : original;
+  return recovered.replace(/[\u0000-\u001f\u007f]/g, "").replace(/[\\/]/g, "_").trim().slice(-180) || "file";
+}
+
 function objectKey(fields, file, category = "evidence") {
   const now = new Date();
   const extension = extname(file.originalName || file.storedName) || ".bin";
@@ -122,15 +130,16 @@ function parseMultipart(req, uploadRoot) {
     const fields = {};
     let file;
     let total = 0;
-    const busboy = Busboy({ headers: req.headers, limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 30 } });
+    const busboy = Busboy({ headers: req.headers, defParamCharset: "utf8", limits: { fileSize: MAX_UPLOAD_BYTES, files: 1, fields: 30 } });
     busboy.on("field", (name, value) => { fields[name] = value.slice(0, 100_000); });
     busboy.on("file", (name, stream, info) => {
-      const extension = extname(info.filename || "") || ({ "image/jpeg": ".jpg", "image/png": ".png", "audio/mpeg": ".mp3", "audio/mp4": ".m4a" }[info.mimeType] ?? ".bin");
+      const originalName = normalizeUploadFileName(info.filename);
+      const extension = extname(originalName) || ({ "image/jpeg": ".jpg", "image/png": ".png", "audio/mpeg": ".mp3", "audio/mp4": ".m4a" }[info.mimeType] ?? ".bin");
       const storedName = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}${safeName(extension)}`;
       const chunks = [];
       stream.on("data", chunk => { total += chunk.length; chunks.push(chunk); });
       stream.on("limit", () => reject(Object.assign(new Error("上传文件超过 25MB"), { status: 413 })));
-      stream.on("end", () => { file = { field: name, originalName: info.filename, mimeType: info.mimeType, storedName, buffer: Buffer.concat(chunks) }; });
+      stream.on("end", () => { file = { field: name, originalName, mimeType: info.mimeType, storedName, buffer: Buffer.concat(chunks) }; });
     });
     busboy.on("error", reject);
     busboy.on("finish", async () => {
@@ -335,13 +344,15 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
 
     if (pathname === "/api/admin/summary" && req.method === "GET") {
       requireAdmin(req);
+      const usesBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+      const localPersistent = !process.env.VERCEL;
       return json({
         teamConfig: state.teamConfig,
         dashboard: state.dashboard,
         counts: { members: state.dashboard.members?.length ?? 0, assignments: state.dashboard.summary?.siteAssignmentCount ?? 0, uniqueSites: state.dashboard.summary?.uniqueSiteCount ?? 0, evidence: state.media.length, problems: state.problems.length, solutions: state.solutions.length, tasks: state.collab.tasks?.length ?? 0, knowledge: state.knowledgeDocs.length, knowledgeSources: state.knowledgeSources?.length ?? 0, knowledgeChunks: state.knowledgeChunks?.length ?? 0, finalReports: Object.keys(state.finalReports ?? {}).length, reportVersions:Object.values(state.iterations??{}).reduce((sum,item)=>sum+(item.versions?.length??0),0) },
-        storage:{mode:process.env.BLOB_READ_WRITE_TOKEN?"private-blob":"local-json",persistent:Boolean(process.env.BLOB_READ_WRITE_TOKEN)||!process.env.VERCEL,warning:process.env.BLOB_READ_WRITE_TOKEN?"私有 Blob 已连接；并发整份 JSON 写入仍可能后写覆盖先写。":"当前未连接生产持久存储。"},
+        storage:{mode:usesBlob?"private-blob":"local-json",persistent:usesBlob||localPersistent,warning:usesBlob?"私有 Blob 已连接；并发整份 JSON 写入仍可能后写覆盖先写。":localPersistent?"生产数据已持久化到服务器本地 JSON 与 uploads；发布前后应保留完整备份。":"当前未连接生产持久存储。"},
         knowledgeSources: state.knowledgeSources ?? [],
-        finalReports: Object.values(state.finalReports ?? {}),
+        finalReports: Object.values(state.finalReports ?? {}).map(report => { const version=(state.iterations[keyFor(report.memberId,report.companyId)]?.versions??[]).find(item=>item.source==="admin-final");return{...report,versionLabel:version?.label??"管理员定稿",versionId:version?.id}; }),
         tasks: state.collab.tasks ?? [],
         recentEvidence: state.media.slice(0, 50),
         updatedAt: state.updatedAt
@@ -379,7 +390,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
       requireAdmin(req);const id=pathname.split("/").pop();await store.update(value=>{value.media=value.media.filter(item=>item.id!==id);value.agentFeed=value.agentFeed.filter(item=>item.mediaId!==id)});return json({ok:true});
     }
     if (pathname.startsWith("/api/admin/final-reports/") && req.method === "DELETE") {
-      requireAdmin(req);const key=decodeURIComponent(pathname.split("/").pop());await store.update(value=>{delete value.finalReports[key]});return json({ok:true});
+      requireAdmin(req);const rawKey=decodeURIComponent(pathname.split("/").pop());const key=rawKey.includes("::")?rawKey:rawKey.replace(/^([^:]+):(.+)$/,"$1::$2");let removed=false;await store.update(value=>{removed=Boolean(value.finalReports[key]);delete value.finalReports[key]});return removed?json({ok:true,key}):json({error:"管理员定稿不存在"},404);
     }
     if (pathname === "/api/admin/report-upload" && req.method === "POST") {
       requireAdmin(req);
@@ -639,7 +650,7 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
         member.totalSites = member.sites?.length ?? 0;
         member.sitesComplete = member.sites?.filter(site => site.questionsComplete).length ?? 0;
       }
-      const allSites=dashboard.members?.flatMap(member=>member.sites??[])??[];dashboard.summary={...dashboard.summary,sitesQuestionsComplete:allSites.filter(site=>site.questionsComplete).length,sitesDualValidated:allSites.filter(site=>site.pioneerTaggedCount&&site.iterateTaggedCount).length,validatedQuestionCount:allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0),questionCount:allSites.reduce((sum,site)=>sum+site.questions.length,0),questionValidationPercent:allSites.reduce((sum,site)=>sum+site.questions.length,0)?Math.round(allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0)/allSites.reduce((sum,site)=>sum+site.questions.length,0)*100):0,averageClosurePercent:allSites.length?Math.round(allSites.reduce((sum,site)=>sum+site.closurePercent,0)/allSites.length):0,evidenceCount:state.media.length,problemCount:state.problems.length,confirmedProblemCount:state.problems.filter(item=>item.validationOutcome==="confirmed").length,solutionCount:state.solutions.length,linkedSolutionCount:state.solutions.filter(item=>item.linkedProblemIds?.length).length,testedSolutionCount:state.solutions.filter(item=>["validated","iterate"].includes(item.validationStatus)).length,reportReadyCount:Object.keys(state.generatedReports??{}).length+Object.keys(state.finalReports??{}).length};
+      const allSites=dashboard.members?.flatMap(member=>member.sites??[])??[];const reportKeys=new Set([...Object.keys(state.generatedReports??{}),...Object.keys(state.finalReports??{})]);dashboard.summary={...dashboard.summary,sitesQuestionsComplete:allSites.filter(site=>site.questionsComplete).length,sitesDualValidated:allSites.filter(site=>site.pioneerTaggedCount&&site.iterateTaggedCount).length,validatedQuestionCount:allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0),questionCount:allSites.reduce((sum,site)=>sum+site.questions.length,0),questionValidationPercent:allSites.reduce((sum,site)=>sum+site.questions.length,0)?Math.round(allSites.reduce((sum,site)=>sum+site.validatedQuestionCount,0)/allSites.reduce((sum,site)=>sum+site.questions.length,0)*100):0,averageClosurePercent:allSites.length?Math.round(allSites.reduce((sum,site)=>sum+site.closurePercent,0)/allSites.length):0,evidenceCount:state.media.length,problemCount:state.problems.length,confirmedProblemCount:state.problems.filter(item=>item.validationOutcome==="confirmed").length,solutionCount:state.solutions.length,linkedSolutionCount:state.solutions.filter(item=>item.linkedProblemIds?.length).length,testedSolutionCount:state.solutions.filter(item=>["validated","iterate"].includes(item.validationStatus)).length,reportReadyCount:reportKeys.size};
       if (memberId) dashboard.members = dashboard.members?.filter(item => item.memberId === memberId) ?? [];
       dashboard.updatedAt = state.updatedAt;
       return json(dashboard);
