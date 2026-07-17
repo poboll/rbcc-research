@@ -1,50 +1,146 @@
-# 红八宝 · 八爪鱼组 / RBCC 调研协作系统
+# RBCC 2026 人机共生调研协作与成果汇报系统
 
-这是 `https://dropaigc.com` 的可运行恢复工程。`frontend/src/` 是按线上界面重新实现的 React 前端源码，`src/server/` 是依据客户端公开 API 契约重建的后端源码，包含协作、上传、知识库、红小八 Agent、报告编辑、万字报告生成和 DOCX 导出。原线上 Next.js 发布包保存在 `public/`，仅作为逐页对照与字体、图标兜底。
+红八宝 · 八爪鱼组为 RBCC 2026 挑战营构建的调研协作产品。系统把分散在队员手机、现场笔记和访谈中的材料组织成一条可追溯的研究链路：
 
-## 运行
+> 预设问题 → 现场留痕 → 事实与推断分离 → 痛点验证 → 方案试验 → 四核报告 → 教师评审 → 全功能路演
+
+它既服务于三天现场调研，也服务于阶段汇报和最终成果沉淀。每个结论都尽可能保留成员、站点、时间、问题与证据之间的关联，避免报告脱离现场材料。
+
+## 产品角色
+
+- **调研队员**：按日期、线路和站点查看任务，维护预设问题，上传图片、录音和文字，记录验证结论。
+- **小组协作者**：在协同 Hub 和全组视图中查看五名成员的进度、证据缺口、共识与分歧。
+- **管理员**：管理成员、路线、站点、问题、证据、知识来源、痛点、方案、报告版本和 DOCX 定稿。
+- **教师与评审**：沿推荐评审路径查看真实进展、代表证据、方案成熟度、报告和演示内容。
+
+## 核心功能
+
+### 1. 现场调研
+
+- 队员端根据身份展示本人三天路线、站点和调研任务。
+- 预设问题支持开拓、迭代标签以及成立、部分成立、推翻、待验证状态。
+- 图片、录音和文字留痕关联成员、站点、时间与证据类型。
+- 浏览器上传图片前自动转换 WebP 并压缩，服务端校验文件类型、签名和大小。
+- 留痕库支持成员、日期、站点与类型筛选，以及桌面和移动端大图预览。
+
+### 2. 红八宝 Agent
+
+- 基于知识库、现场留痕、问题记录、痛点和方案提供调研辅助。
+- 输出时区分现场事实、成员推断、访谈原声和待验证假设。
+- 当团队知识库没有答案时，可调用 DeepSeek 提供通识补充，并明确标记其不是本组现场证据。
+- 支持从留痕提炼观察点、从观察点收敛痛点、从痛点生成试验方案并加入报告。
+
+### 3. 痛点与方案闭环
+
+- 痛点保留来源问题和证据记录，展示影响对象、发生场景、后果和验证状态。
+- 方案关联一个或多个痛点，记录目标用户、最小试验、衡量指标、风险与人工兜底。
+- 首页与协同 Hub 将队员、站点、问题、证据、痛点、方案和报告组织成可交互拓扑。
+- 验证比例和完成度由生产数据实时计算，不使用固定演示数字。
+
+### 4. 报告、评审与路演
+
+- 四核报告结构包括现状扫描、人群共情、痛点诊断和分析对策。
+- 报告生成使用站点证据包，并保留引用记录 ID；缺少证据时不补写虚构事实。
+- 支持工作稿、AI 版本和管理员 DOCX 定稿三层状态，以及发布、撤回和版本管理。
+- 评审页提供成员完成度、代表站点、报告阶段、证据深链与 Word 下载。
+- 26 幕全功能路演读取真实调研数据，支持播放、暂停、上一幕、下一幕、从头播放及键盘控制。
+
+## 页面入口
+
+| 路由 | 用途 |
+| --- | --- |
+| `/` | 全组作战视图与调研闭环拓扑 |
+| `/app` | 队员端任务、问题验证与现场上传 |
+| `/collab` | 协同 Hub、五人思考矩阵与组内进展 |
+| `/traces` | 现场留痕库与证据筛选 |
+| `/agent` | 红八宝 Agent 对话与提炼 |
+| `/knowledge`、`/library` | 知识来源、节点与调研资料 |
+| `/dashboard` | 四核调研报告编辑与版本管理 |
+| `/review` | 教师评审路径与成果查看 |
+| `/screen`、`/screen/roadshow` | 投影大屏与 26 幕全功能路演 |
+| `/design` | 大屏密度、字号、节点和画布参数 |
+| `/admin` | 成员、路线、证据、知识和报告管理 |
+
+## 技术实现
+
+### 前端
+
+- React 19、Vite 6 和 Lucide 图标。
+- 单页应用覆盖手机采集、桌面协作、评审和投影演示场景。
+- CSS 变量驱动深浅主题，所有主要页面共享导航、按钮和表单状态。
+- 图片在浏览器端按尺寸与质量迭代压缩为 WebP，减少移动网络和对象存储压力。
+
+### 后端
+
+- Node.js ESM API，Vercel 通过 `api/index.mjs` 提供无服务器入口。
+- `src/server/api.mjs` 负责路由、输入校验、媒体上传、Agent、报告和管理接口。
+- `src/server/store.mjs` 提供本地 JSON 开发存储和生产 Vercel Blob 状态存储。
+- DOCX 使用 `docx` 生成；PDF、DOCX、Markdown、TXT、CSV 和 JSON 可挂载为知识来源。
+- DeepSeek 密钥只从服务端环境读取，不进入浏览器包、仓库或业务数据。
+
+### 生产数据
+
+- 媒体二进制按组、成员和站点写入私有 Vercel Blob 路径。
+- 业务状态保存在私有 Blob JSON 文档中，包含问题、证据元数据、痛点、方案、知识和报告。
+- 每次请求重新读取最新 Blob 状态，单实例内使用写队列减少相互覆盖。
+- Blob JSON 不是事务数据库：多个函数实例同时写入时仍可能出现后写覆盖先写。当前阶段通过短写入、最新状态合并和顺序导入降低风险；更高并发场景应迁移至 PostgreSQL。
+
+## 本地运行
 
 需要 Node.js 20 或更新版本。
 
 ```bash
 npm install
-DEEPSEEK_API_KEY="你的服务端密钥" \
+cp .env.example .env.local
+npm start
+```
+
+默认地址为 `http://127.0.0.1:4173`。启用 Agent 时配置：
+
+```bash
+DEEPSEEK_API_KEY="服务端密钥" \
 DEEPSEEK_MODEL="deepseek-v4-flash" \
 npm start
 ```
 
-打开 `http://127.0.0.1:4173`。
+未配置模型密钥时，系统仍可运行，Agent 和报告功能使用现场证据与本地知识的降级模式。
 
-不配置密钥时页面仍可运行，红小九会使用本地知识库和证据摘要，报告使用已同步的证据版内容。
-
-## 常用命令
+## 开发与验证
 
 ```bash
-npm run sync:deployed  # 重新同步公开页面、静态资源和公开数据
-npm run build:frontend # 从 React 源码生成 web-dist 生产前端
-npm run check          # JavaScript 语法检查
-npm test               # 12 个页面 + 核心 API + Agent 降级 + DOCX 冒烟测试
-npm run dev            # 文件变更时重启服务端
+npm run dev             # 构建前端并监听服务端变更
+npm run dev:frontend    # 启动 Vite 前端开发服务
+npm run build:frontend  # 生成 web-dist 生产前端
+npm run check           # 检查关键服务端 JavaScript 语法
+npm test                # Blob 存储、15 个页面和核心 API 冒烟测试
 ```
 
-## 已恢复内容
+## API 概览
 
-- `/`、`/screen`、`/screen/roadshow`、`/design`、`/review`、`/review/report`
-- `/app`、`/library`、`/agent`、`/traces`、`/dashboard`、`/collab`
-- 第八组“红八宝 · 八爪鱼组”的 5 名队员、3 天 7 条线路、22 个唯一节点和 48 个队员站点分配
-- 调研问题、痛点、方案、协作任务和动态的本地 JSON 开发持久化
-- 图片、录音和文本留痕上传，25MB 大小限制
-- DeepSeek `deepseek-v4-flash` Agent 问答和四板块长报告生成
-- 报告草稿保存、AI 问题/项目建议和标准 DOCX 导出
+- `/api/research-questions`：读取和保存队员站点问题及验证结果。
+- `/api/media`：上传、筛选和读取现场图片、录音与文字证据。
+- `/api/problems`、`/api/solutions`：管理证据关联的痛点和试验方案。
+- `/api/knowledge`：挂载、索引、检索和管理知识来源。
+- `/api/agent`：红八宝对话与现场材料提炼。
+- `/api/research-report`、`/api/member-long-reports`：报告生成、版本与 DOCX 输出。
+- `/api/admin/*`：生产管理接口，写操作要求服务端校验 `x-admin-token`。
 
-## 恢复边界
+## 部署与数据安全
 
-公开发布包没有 source map，因此无法还原原作者的 TSX 文件名、变量名、注释和提交历史。恢复版已在 `frontend/src/` 重新实现可维护前端源码，并从中生成 `web-dist/`；`public/` 保留原发布包作为视觉与行为基准。详见 [架构说明](docs/ARCHITECTURE.md) 与 [恢复设计](docs/plans/2026-07-14-dropaigc-recovery-design.md)。
+项目已关联 Vercel，生产构建命令为 `npm run build:frontend`，输出目录为 `web-dist`。生产环境至少需要配置：
 
-## 生产部署
+```text
+BLOB_READ_WRITE_TOKEN
+ADMIN_TOKEN
+DEEPSEEK_API_KEY
+DEEPSEEK_MODEL=deepseek-v4-flash
+```
 
-Vercel 使用 `api/index.mjs` 和 `vercel.json`。未配置数据库/对象存储时，部署仅用于界面和只读流程评审，函数实例中的写入不会持久保存。生产使用前必须执行 `supabase/migrations/0001_initial_schema.sql`，配置私有媒体 bucket，并接入 PostgreSQL/Storage adapter。详见 [数据库与媒体架构](docs/DATABASE_AND_MEDIA_ARCHITECTURE.md)。
+部署只更新代码和静态资源，不会主动执行种子脚本、替换 Blob 状态主键或清空队员上传。发布前后应记录成员、问题、证据、知识、痛点、方案与报告数量；出现代码异常时回滚部署，不重置生产 Blob 数据。
 
-## 密钥安全
+密钥只允许通过 Vercel 加密环境变量配置。任何曾出现在聊天、日志或历史文件中的密钥都应轮换。
 
-`DEEPSEEK_API_KEY` 只从服务端进程环境读取。不要把密钥放进 `public/`、JSON 数据、`.env.example` 或提交历史。此前在聊天中出现过的密钥必须轮换，不能直接用于生产部署。
+## 项目文档
+
+- [系统架构](docs/ARCHITECTURE.md)
+- [数据库与媒体架构](docs/DATABASE_AND_MEDIA_ARCHITECTURE.md)
