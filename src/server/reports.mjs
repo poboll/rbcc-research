@@ -55,12 +55,18 @@ function findSite(state, memberId, companyId) {
   return { member, site };
 }
 
+function completenessFor(sections) {
+  const filled = REPORT_BLOCKS.flatMap(block => block.parts.map(part => sections?.[block.id]?.[part] ?? [])).filter(items => items.length).length;
+  return { percent: Math.round(filled / 16 * 100), ready: filled >= 12, missing: [] };
+}
+
 export function baseReport(state, memberId, companyId, groupModeId = "iterate") {
   const key = `${memberId}::${companyId}`;
   const saved = state.generatedReports[key] ?? state.researchReports[key];
   if (saved && !saved.error) {
     const draft = state.reportDrafts[key];
-    return draft ? { ...saved, sections: draft.sections, draftSections: draft.sections, hasDraft: true, draftUpdatedAt: draft.updatedAt } : saved;
+    const sections = draft?.sections ?? saved.sections;
+    return { ...saved, sections, ...(draft ? { draftSections: sections, hasDraft: true, draftUpdatedAt: draft.updatedAt } : {}), completeness: completenessFor(sections) };
   }
   const { member, site } = findSite(state, memberId, companyId);
   const evidence = evidenceFor(state, memberId, companyId);
@@ -70,14 +76,13 @@ export function baseReport(state, memberId, companyId, groupModeId = "iterate") 
   sections.painPoints.hypotheses = evidence.questions.map(item => item.text).filter(Boolean);
   sections.painPoints.evidence = evidence.problems.map(item => item.evidence || item.observation).filter(Boolean);
   sections.conception.proposals = evidence.solutions.map(item => item.description || item.title).filter(Boolean);
-  const filled = REPORT_BLOCKS.flatMap(block => block.parts.map(part => sections[block.id][part])).filter(items => items.length).length;
   return {
     meta: { title: `${site?.companyName ?? companyId} 实地调研报告`, memberId, memberName: member?.memberName ?? memberId, companyId, companyName: site?.companyName ?? companyId, groupModeId, groupModeLabel: groupModeId === "pioneer" ? "开拓组" : "迭代组", generatedAt: new Date().toISOString(), source:"evidence", version:1 },
     sections,
     autoSections: sections,
     raw: evidence,
     citations:citationsFor(evidence),
-    completeness: { percent: Math.round(filled / 16 * 100), ready: filled >= 12, missing: [] },
+    completeness: completenessFor(sections),
     hasDraft: false,
     pillarsAutofilled: true
   };
