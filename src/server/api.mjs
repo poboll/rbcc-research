@@ -57,8 +57,15 @@ function objectKey(fields, file, category = "evidence") {
 
 async function persistBlob(fields, file, category) {
   if (!file || !process.env.BLOB_READ_WRITE_TOKEN) return null;
-  const result = await putBlob(objectKey(fields, file, category), file.buffer, { access: "private", contentType: file.mimeType, addRandomSuffix: false });
-  return { pathname: result.pathname, url: result.url };
+  try {
+    const result = await putBlob(objectKey(fields, file, category), file.buffer, { access: "private", contentType: file.mimeType, addRandomSuffix: false });
+    return { pathname: result.pathname, url: result.url };
+  } catch (error) {
+    // A persistent self-hosted instance has already written the upload locally.
+    // Keep field work available if the optional Blob mirror is suspended.
+    if (!process.env.VERCEL) return null;
+    throw error;
+  }
 }
 
 async function extractDocument(file) {
@@ -439,8 +446,8 @@ export function createApi({ store, root, uploadRoot = join(root, "data", "upload
     }
     if (pathname.startsWith("/api/media/file/") && req.method === "GET") {
       const id=pathname.split("/").pop();const item=state.media.find(value=>value.id===id);if(!item)return json({error:"现场文件不存在"},404);
-      let document;if(item.blobPathname&&process.env.BLOB_READ_WRITE_TOKEN){const blob=await getBlob(item.blobPathname,{access:"private"});if(!blob)return json({error:"现场文件不存在"},404);document=Buffer.from(await new Response(blob.stream).arrayBuffer())}else if(item.storedName)document=await readFile(join(uploadRoot,safeName(item.storedName)));else return json({error:"该留痕没有附件"},404);
-      return {status:200,body:document,type:item.mimeType||"application/octet-stream",headers:{"content-disposition":`inline; filename*=UTF-8''${encodeURIComponent(item.fileName||"evidence")}`}};
+      let document;if(item.storedName&&!process.env.VERCEL)document=await readFile(join(uploadRoot,safeName(item.storedName)));else if(item.blobPathname&&process.env.BLOB_READ_WRITE_TOKEN){const blob=await getBlob(item.blobPathname,{access:"private"});if(!blob)return json({error:"现场文件不存在"},404);document=Buffer.from(await new Response(blob.stream).arrayBuffer())}else if(item.storedName)document=await readFile(join(uploadRoot,safeName(item.storedName)));else return json({error:"该留痕没有附件"},404);
+      return {status:200,body:document,type:item.mimeType||"application/octet-stream",headers:{"cache-control":"public, max-age=31536000, immutable","content-disposition":`inline; filename*=UTF-8''${encodeURIComponent(item.fileName||"evidence")}`}};
     }
     if (pathname === "/api/media/upload" && req.method === "POST") {
       const { fields, file } = await parseMultipart(req, uploadRoot);
