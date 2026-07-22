@@ -1,6 +1,8 @@
 {
-  "name": "dropaigc-recovered",
+  "name": "rbcc-research",
   "version": "2.0.0",
+  "description": "RBCC 2026 human-AI research collaboration and presentation system",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {
