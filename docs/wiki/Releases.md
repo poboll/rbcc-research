@@ -13,3 +13,10 @@
 - Linux 单节点自托管与数据备份流程。
 
 正式版本见 <https://github.com/poboll/rbcc-research/releases>。
+
+## 发布约定
+
+- 版本采用语义化版本号。
+- Release 只描述已经实现并验证的能力。
+- 发布代码不携带生产 `data/app-state.json`、上传附件或密钥。
+- 升级前备份，代码回滚与业务数据恢复分开处理。
